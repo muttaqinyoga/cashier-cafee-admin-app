@@ -1,0 +1,32 @@
+[
+    {
+        "ID": 1,
+        "name": "Nasi Goreng Biasa",
+        "price": 20000.00,
+        "stock": "TERSEDIA"
+    },
+    {
+        "ID": 2,
+        "name": "Nasi Goreng Spesial",
+        "price": 30000.00,
+        "stock": "TERSEDIA"
+    },
+    {
+        "ID": 3,
+        "name": "Teh Manis Dingin",
+        "price": 8000.00,
+        "stock": "TERSEDIA"
+    },
+    {
+        "ID": 4,
+        "name": "Caffucino Dingin",
+        "price": 10000.00,
+        "stock": "TERSEDIA"
+    },
+    {
+        "ID": 5,
+        "name": "Green tea",
+        "price": 11000.00,
+        "stock": "Tidak tersedia"
+    }
+]
