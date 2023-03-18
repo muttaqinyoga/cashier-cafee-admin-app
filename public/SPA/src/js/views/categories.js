@@ -1,4 +1,5 @@
 // import "../components/utility/ConfirmDelete.js";
+import "../components/utility/ConfirmDeleteModal.js";
 export default () =>
     /*html*/
     `
@@ -8,7 +9,7 @@ export default () =>
             <div class="card-body text-white">
                 <div class="row">
                     <div class="col-md-3">
-                        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
                             Add New Category
                         </button>
                     </div>
@@ -24,7 +25,7 @@ export default () =>
     <div class="modal fade text-left" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModal" role="dialog">
         <div class="modal-dialog modal-dialog-top modal-dialog-scrollable" role="document">
             <div class="modal-content">
-                <div class="modal-header bg-success">
+                <div class="modal-header bg-primary">
                     <h4 class="modal-title text-light">Add Food Category</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
 
@@ -52,7 +53,7 @@ export default () =>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             Cancel
                         </button>
-                        <button type="submit" class="btn btn-success ml-1">
+                        <button type="submit" class="btn btn-primary ml-1">
                             Save
                         </button>
                     </div>
@@ -104,4 +105,5 @@ export default () =>
             </div>
         </div>
     </div>
+    <confirm-delete-modal></confirm-delete-modal>
 `;

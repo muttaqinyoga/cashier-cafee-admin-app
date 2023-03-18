@@ -1,7 +1,7 @@
 import categories from "../views/categories.js";
 import "../libs/simple-datatables/simple-datatables.js";
-import validation from "../components/utility/validation.js";
 import routing from "../components/routing.js";
+
 const category = {
     view: function (page) {
         switch (page) {
@@ -19,313 +19,6 @@ const category = {
             default:
                 this.method.index();
         }
-        // loadCategories();
-        // let loading = APP_LOADING.activate();
-        // let FoodDataTables = null;
-        // let Foods = {
-        //     headings: ["Id", "Slug", "Name", "Image", "Action"],
-        //     data: [],
-        // };
-        // const toastAlert = document.querySelector("#toastAlert");
-        // const toastBody = document.querySelector("#toastAlert .toast-body");
-        // const toast = new bootstrap.Toast(toastAlert);
-        // const delete_id = document.querySelector(
-        //     "#deleteConfirmModal #delete_id"
-        // );
-        // const deleteConfirmModal = new bootstrap.Modal("#deleteConfirmModal");
-        // const deleteCategoryForm = document.querySelector(
-        //     "#deleteConfirmModal #deleteCategoryForm"
-        // );
-        // const deleteConfirmModalBody = document.querySelector(
-        //     "#deleteConfirmModal .modal-body"
-        // );
-        // const editCategoryModal = new bootstrap.Modal("#editCategoryModal");
-        // const editCategoryForm = document.querySelector(
-        //     "#editCategoryModal #editCategoryForm"
-        // );
-        // const edit_id = document.querySelector(
-        //     "#editCategoryModal #editCategoryForm #edit_id"
-        // );
-        // // Get Categories
-        // function loadCategories() {
-        //     fetch(`${baseUrl}/api/admin/categories/get`)
-        //         .then((response) => {
-        //             return response.json();
-        //         })
-        //         .then((res) => {
-        //             if (res.status === "success") {
-        //                 for (let i = 0; i < res.data.length; i++) {
-        //                     Foods.data[i] = [];
-        //                     Foods.data[i].push(res.data[i]["id"]);
-        //                     Foods.data[i].push(res.data[i]["slug"]);
-        //                     Foods.data[i].push(res.data[i]["name"]);
-        //                     Foods.data[i].push(res.data[i]["image"]);
-        //                     Foods.data[i].push(res.data[i]["created_at"]);
-        //                 }
-        //                 initFoodTable();
-        //                 APP_LOADING.cancel(loading);
-        //                 return;
-        //             }
-        //             initFoodTable();
-        //             throw new Error(res.message);
-        //         })
-        //         .catch(console.error);
-        // }
-        // function initFoodTable() {
-        //     const foodTables = document.querySelector("#foodTables");
-        //     FoodDataTables = new simpleDatatables.DataTable(foodTables, {
-        //         data: Foods,
-        //         columns: [
-        //             {
-        //                 select: 3,
-        //                 sortable: false,
-        //                 render: function (data) {
-        //                     return `<img src="${assetUrl}images/categories/${data}" class="img-fluid mx-auto d-block" alt="food-categories" width="100">`;
-        //                 },
-        //             },
-        //             {
-        //                 select: 4,
-        //                 sortable: false,
-        //                 render: function (data, cell, row) {
-        //                     return `
-        //                         <button type="button" class="btn btn-warning btn-sm editCategory" >Edit</button>
-        //                         <button type="button"  class="btn btn-danger btn-sm deleteCategory" >Delete</button>
-        //                         `;
-        //                 },
-        //             },
-        //             {
-        //                 select: 0,
-        //                 sortable: false,
-        //                 hidden: true,
-        //             },
-        //             {
-        //                 select: 1,
-        //                 sortable: false,
-        //                 hidden: true,
-        //             },
-        //         ],
-        //         perPage: 4,
-        //         perPageSelect: [4, 10, 20, 50],
-        //     });
-        //     FoodDataTables.on("datatable.init", function () {
-        //         const thead = document.querySelector("#foodTables > thead");
-        //         thead.classList.add("table-dark");
-        //     });
-        // }
-        // foodTables.addEventListener("click", function (e) {
-        //     if (e.target.classList.contains("deleteCategory")) {
-        //         const data =
-        //             FoodDataTables.data[
-        //                 e.target.parentNode.parentNode.dataIndex
-        //             ];
-        //         const deleteCategory = {
-        //             id: data.childNodes[0].data,
-        //             name: data.childNodes[2].data,
-        //         };
-        //         delete_id.value = deleteCategory.id;
-        //         deleteConfirmModalBody.innerHTML = `Do you want to Delete <strong>${deleteCategory.name}</strong> from Category List ?`;
-        //         deleteConfirmModal.show();
-        //     } else if (e.target.classList.contains("editCategory")) {
-        //         const data =
-        //             FoodDataTables.data[
-        //                 e.target.parentNode.parentNode.dataIndex
-        //             ];
-        //         const editCategory = {
-        //             id: data.childNodes[0].data,
-        //             name: data.childNodes[2].data,
-        //             imgSrc: data.childNodes[3].childNodes[0].currentSrc,
-        //         };
-        //         editCategoryForm.reset();
-        //         edit_id.value = editCategory.id;
-        //         document.querySelector("#category_edit_name").value =
-        //             editCategory.name;
-        //         document
-        //             .querySelector("#current_category_edit_image")
-        //             .setAttribute("src", editCategory.imgSrc);
-        //         validation.run("category_edit_name");
-        //         editCategoryModal.show();
-        //     }
-        // });
-        // deleteCategoryForm.addEventListener("submit", function (e) {
-        //     e.preventDefault();
-        //     loading = APP_LOADING.activate();
-        //     const payloadDeleteCategory = {
-        //         _token: csrf,
-        //         _method: "DELETE",
-        //         delete_id: document
-        //             .getElementsByName("delete_id")[0]
-        //             .getAttribute("value"),
-        //     };
-        //     fetch(`${baseUrl}/api/admin/categories/delete`, {
-        //         method: "DELETE",
-        //         headers: {
-        //             accept: "application/json",
-        //             "Content-type": "application/json; charset=UTF-8",
-        //             "X-CSRF-TOKEN": csrf,
-        //         },
-        //         credentials: "same-origin",
-        //         body: JSON.stringify(payloadDeleteCategory),
-        //     })
-        //         .then((response) => response.json())
-        //         .then((res) => {
-        //             if (res.status === "failed") {
-        //                 deleteConfirmModal.hide();
-        //                 deleteCategoryForm.reset();
-        //                 APP_LOADING.cancel(loading);
-        //                 toastAlert.classList.add("bg-danger");
-        //                 toastBody.textContent = res.message;
-        //                 toast.show();
-        //                 return;
-        //             } else if (res.status === "success") {
-        //                 FoodDataTables.destroy();
-        //                 FoodDataTables = null;
-        //                 Foods.data = [];
-        //                 deleteConfirmModal.hide();
-        //                 loadCategories();
-        //                 toastAlert.classList.add("bg-success");
-        //                 toastBody.textContent = res.message;
-        //                 toast.show();
-        //                 return;
-        //             }
-        //         })
-        //         .catch((err) => {
-        //             console.error;
-        //         });
-        // });
-        // // Update Category
-        // editCategoryForm.addEventListener("submit", (e) => {
-        //     e.preventDefault();
-        //     if (validation.run("category_edit_name")) {
-        //         const payloadEditCategory = new FormData(editCategoryForm);
-        //         loading = APP_LOADING.activate();
-        //         fetch(`${baseUrl}/api/admin/categories/update`, {
-        //             method: "POST",
-        //             headers: {
-        //                 accept: "application/json",
-        //             },
-        //             credentials: "same-origin",
-        //             body: payloadEditCategory,
-        //         })
-        //             .then((response) => response.json())
-        //             .then((res) => {
-        //                 if (res.status === "failed") {
-        //                     APP_LOADING.cancel(loading);
-        //                     if (res.errors) {
-        //                         Object.keys(res.errors).forEach(
-        //                             (key, index) => {
-        //                                 const elemInput =
-        //                                     document.getElementById(key);
-        //                                 const elemFeedBack =
-        //                                     document.getElementById(
-        //                                         key + "_feedback"
-        //                                     );
-        //                                 if (elemInput && elemFeedBack) {
-        //                                     elemInput.classList.add(
-        //                                         "is-invalid"
-        //                                     );
-        //                                     elemFeedBack.textContent =
-        //                                         res.errors[key][0];
-        //                                 }
-        //                             }
-        //                         );
-        //                         return;
-        //                     }
-        //                     editCategoryModal.hide();
-        //                     editCategoryForm.reset();
-        //                     toastAlert.classList.add("bg-danger");
-        //                     toastBody.textContent = res.message;
-        //                     toast.show();
-        //                     return;
-        //                 } else if (res.status === "success") {
-        //                     editCategoryModal.hide();
-        //                     editCategoryForm.reset();
-        //                     APP_LOADING.cancel(loading);
-        //                     FoodDataTables.destroy();
-        //                     FoodDataTables = null;
-        //                     Foods.data = [];
-        //                     loadCategories();
-        //                     toastAlert.classList.add("bg-warning");
-        //                     toastBody.textContent = res.message;
-        //                     toast.show();
-        //                 }
-        //             })
-        //             .catch((err) => console.error);
-        //     }
-        // });
-        // // Save Category
-        // const addCategoryModal = new bootstrap.Modal("#addCategoryModal");
-        // const addCategoryForm = document.querySelector(
-        //     "#addCategoryModal #addCategoryForm"
-        // );
-        // const inputs = document.querySelectorAll("input");
-        // inputs.forEach(function (input) {
-        //     input.addEventListener("input", function (e) {
-        //         if (e.target.type === "file") {
-        //             validation.checkFile(e.target.name);
-        //             return;
-        //         }
-        //         validation.run(input.id);
-        //         return;
-        //     });
-        // });
-        // addCategoryForm.addEventListener("submit", (e) => {
-        //     e.preventDefault();
-        //     if (validation.run("category_name")) {
-        //         const payloadCategory = new FormData(addCategoryForm);
-        //         loading = APP_LOADING.activate();
-        //         fetch(`${baseUrl}/api/admin/categories/save`, {
-        //             method: "POST",
-        //             headers: {
-        //                 accept: "application/json",
-        //             },
-        //             credentials: "same-origin",
-        //             body: payloadCategory,
-        //         })
-        //             .then((response) => response.json())
-        //             .then((res) => {
-        //                 if (res.status === "failed") {
-        //                     APP_LOADING.cancel(loading);
-        //                     if (res.errors) {
-        //                         Object.keys(res.errors).forEach(
-        //                             (key, index) => {
-        //                                 const elemInput =
-        //                                     document.getElementById(key);
-        //                                 const elemFeedBack =
-        //                                     document.getElementById(
-        //                                         key + "_feedback"
-        //                                     );
-        //                                 if (elemInput && elemFeedBack) {
-        //                                     elemInput.classList.add(
-        //                                         "is-invalid"
-        //                                     );
-        //                                     elemFeedBack.textContent =
-        //                                         res.errors[key][0];
-        //                                 }
-        //                             }
-        //                         );
-        //                         return;
-        //                     }
-        //                     addCategoryModal.hide();
-        //                     addCategoryForm.reset();
-        //                     toastAlert.classList.add("bg-danger");
-        //                     toastBody.textContent = res.message;
-        //                     toast.show();
-        //                 } else if (res.status === "created") {
-        //                     addCategoryModal.hide();
-        //                     addCategoryForm.reset();
-        //                     APP_LOADING.cancel(loading);
-        //                     FoodDataTables.destroy();
-        //                     FoodDataTables = null;
-        //                     Foods.data = [];
-        //                     loadCategories();
-        //                     toastAlert.classList.add("bg-primary");
-        //                     toastBody.textContent = res.message;
-        //                     toast.show();
-        //                 }
-        //             })
-        //             .catch((err) => console.error);
-        //     }
-        // });
     },
     method: {
         data: {
@@ -335,11 +28,19 @@ const category = {
                 data: null,
             },
             loading: null,
+            dom: {
+                addCategoryModal: null,
+                addCategoryForm: null,
+                editCategoryModal: null,
+                editCategoryForm: null,
+                ConfirmDeleteModal: null,
+                deleteConfirmForm: null,
+                inputs: null,
+            },
         },
         index: async function () {
             this.data.loading = APP_LOADING.activate();
             this.data.categoryList = await this.getCategories();
-            APP_LOADING.cancel(this.data.loading);
             if (this.data.categoryList.status) {
                 this.data.table.headings = [
                     "Id",
@@ -367,18 +68,157 @@ const category = {
                         this.data.categoryList.data[i]["created_at"]
                     );
                 }
+                this.data.dom.inputs = document.querySelectorAll("input");
+
                 this.initFoodTable(this.data.table);
+                this.data.dom.inputs.forEach(function (input) {
+                    input.addEventListener("input", function (e) {
+                        e.target.classList.remove("is-invalid");
+                    });
+                });
+
+                /*   ADD CATEGORY  */
+                this.data.dom.addCategoryModal = new bootstrap.Modal(
+                    "#addCategoryModal"
+                );
+                const addCategoryModal =
+                    document.getElementById("addCategoryModal");
+                addCategoryModal.addEventListener("show.bs.modal", (m) => {
+                    this.data.dom.inputs.forEach((i) => {
+                        i.classList.remove("is-invalid");
+                    });
+                });
+                this.data.dom.addCategoryForm =
+                    document.querySelector("#addCategoryForm");
+
+                this.data.dom.addCategoryForm.addEventListener(
+                    "submit",
+                    async (e) => {
+                        e.preventDefault();
+                        const addFormData = new FormData(
+                            this.data.dom.addCategoryForm
+                        );
+                        if (this.validate(addFormData)) {
+                            TOAST.classList.remove("bg-primary");
+                            TOAST.classList.remove("bg-danger");
+                            this.data.loading = APP_LOADING.activate();
+                            this.data.dom.addCategoryModal.hide();
+                            const saved = await this.store(addFormData);
+                            if (!saved.status) {
+                                APP_LOADING.cancel(this.data.loading);
+                                const res = saved.data;
+                                TOAST.classList.add("bg-danger");
+                                if (res.errors) {
+                                    TOAST_BODY.innerHTML = "";
+                                    const ul = document.createElement("ul");
+                                    Object.keys(res.errors).forEach((key) => {
+                                        const li = document.createElement("li");
+                                        li.textContent = res.errors[key][0];
+                                        ul.appendChild(li);
+                                    });
+                                    TOAST_BODY.appendChild(ul);
+                                } else {
+                                    TOAST_BODY.textContent = saved.message;
+                                }
+                                TOAST_APP.show();
+                            } else {
+                                APP_LOADING.cancel(this.data.loading);
+                                TOAST_BODY.textContent = saved.message;
+                                TOAST.classList.add("bg-primary");
+                                TOAST_APP.show();
+                                routing.run("/admin/category");
+                            }
+                        }
+                    }
+                );
+                /*   END ADD CATEGORY  */
+
+                /*   DELETE CATEGORY  */
+                this.data.dom.ConfirmDeleteModal = new bootstrap.Modal(
+                    "#ConfirmDeleteModal"
+                );
+                this.data.dom.deleteConfirmForm =
+                    document.querySelector("#deleteConfirmForm");
+                this.data.dom.deleteConfirmForm.addEventListener(
+                    "submit",
+                    async (e) => {
+                        e.preventDefault();
+                        TOAST.classList.remove("bg-primary");
+                        TOAST.classList.remove("bg-danger");
+                        this.data.dom.ConfirmDeleteModal.hide();
+                        this.data.loading = APP_LOADING.activate();
+                        const deleteCategoryForm = new FormData(e.target);
+                        const deleted = await this.delete(deleteCategoryForm);
+                        if (!deleted.status) {
+                            APP_LOADING.cancel(this.data.loading);
+                            TOAST.classList.add("bg-danger");
+                            TOAST_BODY.textContent = deleted.message;
+                            TOAST_APP.show();
+                        } else {
+                            APP_LOADING.cancel(this.data.loading);
+                            TOAST_BODY.textContent = deleted.message;
+                            TOAST.classList.add("bg-primary");
+                            TOAST_APP.show();
+                            routing.run("/admin/category");
+                        }
+                    }
+                );
+                /*   END DELETE CATEGORY  */
+
+                /*   EDIT CATEGORY  */
+                this.data.dom.editCategoryModal = new bootstrap.Modal(
+                    "#editCategoryModal"
+                );
+                this.data.dom.editCategoryForm =
+                    document.querySelector("#editCategoryForm");
+                APP_LOADING.cancel(this.data.loading);
+                this.data.dom.editCategoryForm.addEventListener(
+                    "submit",
+                    async (e) => {
+                        e.preventDefault();
+                        const editFormData = new FormData(
+                            this.data.dom.editCategoryForm
+                        );
+                        if (this.validate(editFormData)) {
+                            TOAST.classList.remove("bg-primary");
+                            TOAST.classList.remove("bg-danger");
+                            this.data.loading = APP_LOADING.activate();
+                            this.data.dom.editCategoryModal.hide();
+
+                            const updated = await this.update(editFormData);
+                            if (!updated.status) {
+                                APP_LOADING.cancel(this.data.loading);
+                                TOAST.classList.add("bg-danger");
+                                const res = updated.data;
+                                if (res.errors) {
+                                    TOAST_BODY.innerHTML = "";
+                                    const ul = document.createElement("ul");
+                                    Object.keys(res.errors).forEach((key) => {
+                                        const li = document.createElement("li");
+                                        li.textContent = res.errors[key][0];
+                                        ul.appendChild(li);
+                                    });
+                                    TOAST_BODY.appendChild(ul);
+                                } else {
+                                    TOAST_BODY.textContent = updated.message;
+                                }
+                                TOAST_APP.show();
+                            } else {
+                                APP_LOADING.cancel(this.data.loading);
+                                TOAST_BODY.textContent = updated.message;
+                                TOAST.classList.add("bg-primary");
+                                TOAST_APP.show();
+                                routing.run("/admin/category");
+                            }
+                        }
+                    }
+                );
+                /*  END EDIT CATEGORY  */
             } else {
                 TOAST_BODY.textContent = this.data.categoryList.message;
                 TOAST.classList.add("bg-danger");
                 TOAST_APP.show();
             }
-            // window.addEventListener("click", (e) => {
-            //     if (e.target.classList.contains("editCategory")) {
-            //         this.showEditDialog(e.target);
-            //         return;
-            //     }
-            // });
         },
         getCategories: function () {
             return fetch(`${APP_STATE.baseUrl}/api/admin/categories/get`)
@@ -428,24 +268,43 @@ const category = {
             FoodDataTables.on("datatable.init", () => {
                 const thead = document.querySelector("#foodTables > thead");
                 thead.classList.add("table-dark");
-                const editCategory = document.querySelectorAll(".editCategory");
-                editCategory.forEach((e) => {
-                    e.addEventListener("click", () => {
-                        category.method.showEditDialog(e);
+            });
+            foodTables.addEventListener("click", (e) => {
+                if (e.target.classList.contains("editCategory")) {
+                    this.data.dom.inputs.forEach((i) => {
+                        i.classList.remove("is-invalid");
                     });
-                });
+                    const idx = e.target.parentNode.parentNode.dataIndex;
+                    const data = this.data.table.data[idx];
+                    const category_edit_id =
+                        document.querySelector("#category_edit_id");
+                    const category_edit_name = document.querySelector(
+                        "#category_edit_name"
+                    );
+                    const current_category_edit_image = document.querySelector(
+                        "#current_category_edit_image"
+                    );
+                    category_edit_id.value = data[0];
+                    category_edit_name.value = data[2];
+                    current_category_edit_image.setAttribute(
+                        "src",
+                        APP_STATE.assetUrl + "images/categories/" + data[3]
+                    );
+                    this.data.dom.editCategoryModal.show();
+                } else if (e.target.classList.contains("deleteCategory")) {
+                    const idx = e.target.parentNode.parentNode.dataIndex;
+                    const data = this.data.table.data[idx];
+                    const delete_id = document.querySelector("#delete_id");
+                    const modalBody = document.querySelector(
+                        "#ConfirmDeleteModal .modal-body"
+                    );
+                    modalBody.innerHTML = `Do you want to remove <strong>${data[2]}</strong> from Category List ?`;
+                    delete_id.value = data[0];
+                    this.data.dom.ConfirmDeleteModal.show();
+                }
             });
         },
         validate: function (formData) {
-            // for (let f of formData.values()) {
-            //     if (f.type &&  && f.size > 100000) {
-            //         if(f.type != "image/jpg"){
-            //             return false
-            //         }
-            //     } else {
-
-            //     }
-            // }
             for (let pair of formData.entries()) {
                 if (pair[1].type && pair[1].size > 0) {
                     const elem = document.querySelector("#" + pair[0]);
@@ -478,66 +337,38 @@ const category = {
             }
             return true;
         },
-        showEditDialog: function (elem) {
-            const idx = elem.parentNode.parentNode.dataIndex;
-            const data = this.data.table.data[idx];
-            const editCategoryModal = new bootstrap.Modal("#editCategoryModal");
-
-            const editCategoryForm =
-                document.querySelector("#editCategoryForm");
-            const category_edit_id =
-                document.querySelector("#category_edit_id");
-            const category_edit_name = document.querySelector(
-                "#category_edit_name"
-            );
-            const category_edit_image = document.querySelector(
-                "#category_edit_image"
-            );
-            const current_category_edit_image = document.querySelector(
-                "#current_category_edit_image"
-            );
-
-            const inputs = document.querySelectorAll("input");
-            inputs.forEach(function (input) {
-                input.addEventListener("input", function (e) {
-                    e.target.classList.remove("is-invalid");
+        store: function (payload) {
+            return fetch(`${APP_STATE.baseUrl}/api/admin/categories/save`, {
+                method: "POST",
+                headers: {
+                    accept: "application/json",
+                },
+                credentials: "same-origin",
+                body: payload,
+            })
+                .then((response) => response.json())
+                .then((res) => {
+                    return res;
                 });
-            });
-            category_edit_id.value = data[0];
-            category_edit_name.value = data[2];
-            current_category_edit_image.setAttribute(
-                "src",
-                APP_STATE.assetUrl + "images/categories/" + data[3]
-            );
-            editCategoryModal.show();
-            editCategoryForm.addEventListener("submit", async (e) => {
-                e.preventDefault();
-                const editFormData = new FormData(editCategoryForm);
-                // if (this.validate(editFormData)) {
-                this.data.loading = APP_LOADING.activate();
-                editCategoryModal.hide();
-
-                const updated = await this.update(editFormData);
-                if (updated.status === false) {
-                    APP_LOADING.cancel(this.data.loading);
-                    const res = updated.data;
-                    if (res.errors) {
-                        TOAST_BODY.innerHTML = "";
-                        TOAST.classList.remove("bg-danger");
-                        const ul = document.createElement("ul");
-                        Object.keys(res.errors).forEach((key) => {
-                            const li = document.createElement("li");
-                            li.textContent = res.errors[key][0];
-                            ul.appendChild(li);
-                        });
-                        TOAST_BODY.appendChild(ul);
-                        TOAST.classList.add("bg-danger");
-                        TOAST_APP.show();
-                    }
-                }
-
-                // }
-            });
+        },
+        delete: function (payload) {
+            const newPayload = {
+                delete_id: payload.get("delete_id"),
+            };
+            return fetch(`${APP_STATE.baseUrl}/api/admin/categories/delete`, {
+                method: "DELETE",
+                headers: {
+                    accept: "application/json",
+                    "Content-type": "application/json; charset=UTF-8",
+                    "X-CSRF-TOKEN": APP_STATE.csrf,
+                },
+                credentials: "same-origin",
+                body: JSON.stringify(newPayload),
+            })
+                .then((response) => response.json())
+                .then((res) => {
+                    return res;
+                });
         },
         update: function (payload) {
             return fetch(`${APP_STATE.baseUrl}/api/admin/categories/update`, {
@@ -552,29 +383,6 @@ const category = {
                 .then((res) => {
                     return res;
                 });
-            //             .then((res) => {
-            //                 if (res.status === "failed") {
-            //                     APP_LOADING.cancel(loading);
-            //                     if (res.errors) {
-            //                         Object.keys(res.errors).forEach(
-            //                             (key, index) => {
-            //                                 const elemInput =
-            //                                     document.getElementById(key);
-            //                                 const elemFeedBack =
-            //                                     document.getElementById(
-            //                                         key + "_feedback"
-            //                                     );
-            //                                 if (elemInput && elemFeedBack) {
-            //                                     elemInput.classList.add(
-            //                                         "is-invalid"
-            //                                     );
-            //                                     elemFeedBack.textContent =
-            //                                         res.errors[key][0];
-            //                                 }
-            //                             }
-            //                         );
-            //                         return;
-            //                     }
         },
     },
 };

@@ -9,10 +9,12 @@ use Ramsey\Uuid\Uuid;
 use Throwable;
 use App\Models\Response;
 use Validator;
+use Str;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CategoryController extends Controller
 {
-    const DEFAULT_IMAGE_CATEGORY = 'category-foods.png';
+    const DEFAULT_IMAGE_CATEGORY = 'categories-placeholder.png';
 
     public function index()
     {
@@ -31,27 +33,32 @@ class CategoryController extends Controller
             $response->setStatus(false);
             $response->setMessage("Something Went Wrong in the Server");
             $response->setHttpCode(500);
-            $response->setData([]);
+            $response->setData(null);
         }
         return $response->build();
     }
 
-
-
     public function save(Request $request)
     {
-        $validation = \Validator::make($request->all(), [
+        $validation = Validator::make($request->all(), [
             'category_name' => 'required|string|min:3|max:50|unique:categories,name',
             'category_image' => 'image|mimes:jpeg,png,jpg|max:100'
         ]);
+        $response = new Response();
         if ($validation->fails()) {
-            return response()->json(['status' => 'failed', 'errors' => $validation->errors()], 400);
+            $response->setStatus(false);
+            $response->setMessage("Unprocessable Entity");
+            $response->setHttpCode(422);
+            $response->setData([
+                'errors' => $validation->errors()
+            ]);
+            return $response->build();
         }
         try {
             $newCategory = new Category;
             $newCategory->id = Uuid::uuid4()->getHex();
             $newCategory->name = $request->category_name;
-            $newCategory->slug = \Str::slug($request->category_name, '-');
+            $newCategory->slug = Str::slug($request->category_name, '-');
             if ($request->file('category_image')) {
                 $imageName = time() . $newCategory->slug . '.' . $request->file('category_image')->getClientOriginalExtension();
                 $request->file('category_image')->move(public_path('/images/categories'), $imageName);
@@ -60,9 +67,19 @@ class CategoryController extends Controller
                 $newCategory->image = self::DEFAULT_IMAGE_CATEGORY;
             }
             $newCategory->save();
-            return response()->json(['status' => 'created', 'message' => 'New category added'], 201);
+            $response->setStatus(true);
+            $response->setMessage("New Category added");
+            $response->setHttpCode(201);
+            $response->setData(null);
+            return $response->build();
         } catch (Throwable $e) {
-            return response()->json(['status' => 'failed', 'message' => 'Could not save input request'], 500);
+            $response->setStatus(false);
+            $response->setMessage("Something Went Wrong in the Server");
+            $response->setHttpCode(500);
+            $response->setData([
+                "Details" => $e->getMessage()
+            ]);
+            return $response->build();
         }
     }
 
@@ -86,7 +103,7 @@ class CategoryController extends Controller
 
             $category = Category::findOrFail($request->category_edit_id);
             $category->name = $request->category_edit_name;
-            $category->slug = \Str::slug($request->category_edit_name, '-');
+            $category->slug = Str::slug($request->category_edit_name, '-');
             if ($request->file('category_edit_image')) {
                 if ($category->image != self::DEFAULT_IMAGE_CATEGORY) {
                     unlink(public_path('/images/categories/' . $category->image));
@@ -96,24 +113,56 @@ class CategoryController extends Controller
                 $category->image = $imageName;
             }
             $category->update();
-            return response()->json(['status' => 'success', 'message' => 'Category has beens updated'], 200);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['status' => 'failed', 'message' => 'Could not update requested data'], 400);
+            $response->setStatus(true);
+            $response->setMessage("Category has been updated");
+            $response->setHttpCode(200);
+            $response->setData(null);
+            return $response->build();
+        } catch (ModelNotFoundException $e) {
+            $response->setStatus(false);
+            $response->setMessage("Requested data not found");
+            $response->setHttpCode(400);
+            $response->setData(null);
+            return $response->build();
         } catch (Throwable $e) {
-            return response()->json(['status' => 'failed', 'message' => 'Something Went Wrong in the Server'], 500);
+            $response->setStatus(false);
+            $response->setMessage("Something Went Wrong in the Server");
+            $response->setHttpCode(500);
+            $response->setData([
+                "Details" => $e->getMessage()
+            ]);
+            return $response->build();
         }
     }
 
     public function delete(Request $request)
     {
+        $response = new Response();
         try {
             $category = Category::findOrFail($request->delete_id);
+            if ($category->image != self::DEFAULT_IMAGE_CATEGORY) {
+                unlink(public_path('/images/categories/' . $category->image));
+            }
             $category->delete();
-            return response()->json(['status' => 'success', 'message' => "$category->name has been deleted"]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['status' => 'failed', 'message' => 'Could not delete requested data'], 400);
-        } catch (QueryException $e) {
-            return response()->json(['status' => 'failed', 'message' => 'Could not delete because this category had references to other data'], 500);
+            $response->setStatus(true);
+            $response->setMessage("$category->name has been removed from Category List");
+            $response->setHttpCode(200);
+            $response->setData(null);
+            return $response->build();
+        } catch (ModelNotFoundException $e) {
+            $response->setStatus(false);
+            $response->setMessage("Could not delete requested data");
+            $response->setHttpCode(400);
+            $response->setData(null);
+            return $response->build();
+        } catch (Throwable $e) {
+            $response->setStatus(false);
+            $response->setMessage("Something Went Wrong in the Server");
+            $response->setHttpCode(500);
+            $response->setData([
+                "Details" => $e->getMessage()
+            ]);
+            return $response->build();
         }
     }
 }

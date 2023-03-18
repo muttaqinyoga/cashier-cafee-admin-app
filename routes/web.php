@@ -29,13 +29,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/admin/{path?}', function () {
         return view('app');
     })->where('path', '[\/\w\.-]*');
-    // Route::get('/admin/home', [HomeController::class, 'index']);
-    // Route::get('/admin/categories', [CategoryController::class, 'index']);
     Route::get('/api/admin/categories/get', [CategoryController::class, 'getListCategory']);
     Route::post('/api/admin/categories/save', [CategoryController::class, 'save']);
     Route::post('/api/admin/categories/update', [CategoryController::class, 'update']);
     Route::delete('/api/admin/categories/delete', [CategoryController::class, 'delete']);
-    // Route::get('/admin/foods', [FoodController::class, 'index']);
     Route::get('/api/admin/foods/get', [FoodController::class, 'getListFood']);
     Route::post('/api/admin/foods/save', [FoodController::class, 'save']);
     Route::get('/api/admin/foods/{id}/get', [FoodController::class, 'getFoodById']);

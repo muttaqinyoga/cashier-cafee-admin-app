@@ -1,26 +1,15 @@
-class DeleteModal extends HTMLElement {
+class ConfirmDeleteModal extends HTMLElement {
     constructor() {
         super();
-        const formModal = {
-            id: "deleteConfirmModal",
-            name: "food_id",
-        };
-        const propId = this.getAttribute("id");
-        if (propId == "deleteConfirmFood") {
-            formModal.id = propId;
-            formModal.name = "food_delete_id";
-        }
-        this.innerHTML = `<div class="modal fade text-left" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModal" role="dialog">
+        this.innerHTML = `<div class="modal fade text-left" id="ConfirmDeleteModal" tabindex="-1" aria-labelledby="ConfirmDeleteModal" role="dialog">
                                     <div class="modal-dialog modal-dialog-top modal-dialog-scrollable" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header bg-danger">
                                                 <h4 class="modal-title text-light">Confirm Delete</h4>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-
-                                                </button>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <form method="post" id="${formModal.id}">
-                                                <input type="hidden" name="${formModal.name}" id="${formModal.name}">
+                                            <form method="post" id="deleteConfirmForm">
+                                                <input type="hidden" name="delete_id" id="delete_id">
                                                 <div class="modal-body">
 
                                                 </div>
@@ -38,4 +27,4 @@ class DeleteModal extends HTMLElement {
                             </div>`;
     }
 }
-customElements.define("delete-modal", DeleteModal);
+customElements.define("confirm-delete-modal", ConfirmDeleteModal);
