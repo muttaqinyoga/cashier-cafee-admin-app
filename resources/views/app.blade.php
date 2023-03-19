@@ -77,14 +77,6 @@
         logoutBtn.addEventListener("click", function() {
             formLogout.submit();
         });
-        const navLinks = document.querySelectorAll(".nav-link");
-        const currUrl = window.location.pathname.split("/").pop();
-        navLinks.forEach((e) => {
-            e.classList.remove = "active";
-            if (e.classList.contains(currUrl)) {
-                e.classList.add("active");
-            }
-        });
     </script>
     <script src="{{ asset('js/loadingOverlay.js') }}"></script>
     <script src="{{ asset('js/bootstrap.js') }}"></script>
@@ -93,7 +85,6 @@
         const TOAST_BODY = document.querySelector(
             "#toastApp .toast-body"
         );
-
         const TOAST_APP = new bootstrap.Toast(TOAST);
         const APP_STATE = Object.freeze({
             username: "{{ Auth::user()->username }}",

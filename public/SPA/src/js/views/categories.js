@@ -1,4 +1,3 @@
-// import "../components/utility/ConfirmDelete.js";
 import "../components/utility/ConfirmDeleteModal.js";
 export default () =>
     /*html*/

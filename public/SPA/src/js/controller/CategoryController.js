@@ -68,9 +68,9 @@ const category = {
                         this.data.categoryList.data[i]["created_at"]
                     );
                 }
-                this.data.dom.inputs = document.querySelectorAll("input");
-
                 this.initFoodTable(this.data.table);
+                APP_LOADING.cancel(this.data.loading);
+                this.data.dom.inputs = document.querySelectorAll("input");
                 this.data.dom.inputs.forEach(function (input) {
                     input.addEventListener("input", function (e) {
                         e.target.classList.remove("is-invalid");
@@ -108,7 +108,7 @@ const category = {
                                 APP_LOADING.cancel(this.data.loading);
                                 const res = saved.data;
                                 TOAST.classList.add("bg-danger");
-                                if (res.errors) {
+                                if (res) {
                                     TOAST_BODY.innerHTML = "";
                                     const ul = document.createElement("ul");
                                     Object.keys(res.errors).forEach((key) => {
@@ -171,7 +171,7 @@ const category = {
                 );
                 this.data.dom.editCategoryForm =
                     document.querySelector("#editCategoryForm");
-                APP_LOADING.cancel(this.data.loading);
+
                 this.data.dom.editCategoryForm.addEventListener(
                     "submit",
                     async (e) => {
@@ -190,7 +190,7 @@ const category = {
                                 APP_LOADING.cancel(this.data.loading);
                                 TOAST.classList.add("bg-danger");
                                 const res = updated.data;
-                                if (res.errors) {
+                                if (res) {
                                     TOAST_BODY.innerHTML = "";
                                     const ul = document.createElement("ul");
                                     Object.keys(res.errors).forEach((key) => {
@@ -215,7 +215,8 @@ const category = {
                 );
                 /*  END EDIT CATEGORY  */
             } else {
-                TOAST_BODY.textContent = this.data.categoryList.message;
+                APP_LOADING.cancel(this.data.loading);
+                TOAST_BODY.textContent = this.categoryList.message;
                 TOAST.classList.add("bg-danger");
                 TOAST_APP.show();
             }

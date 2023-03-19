@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
 use Throwable;
@@ -16,10 +15,6 @@ class CategoryController extends Controller
 {
     const DEFAULT_IMAGE_CATEGORY = 'categories-placeholder.png';
 
-    public function index()
-    {
-        return view('categories/index');
-    }
     public function getListCategory()
     {
         $response = new Response();

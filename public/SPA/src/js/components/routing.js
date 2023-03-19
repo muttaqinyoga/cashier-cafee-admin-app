@@ -1,6 +1,6 @@
 import home from "../views/home.js";
 import category from "../controller/CategoryController.js";
-// import food from "../controller/FoodController.js";
+import food from "../controller/FoodController.js";
 
 const app = document.querySelector("#app");
 const routing = {
@@ -19,29 +19,37 @@ const routing = {
                 return category.init("index");
             },
         },
-        // "/admin/foods": {
-        //     title: "Aplikasi Kasir Kafe - Foods",
-        //     render: food.view("index"),
-        //     controller: function () {
-        //         return food.init("index");
-        //     },
-        // },
-        // "/admin/food/add": {
-        //     title: "Aplikasi Kasir Kafe - Add Food",
-        //     render: food.view("create"),
-        //     controller: function () {
-        //         return food.init("create");
-        //     },
-        // },
-        // "/admin/food/:id/edit": {
-        //     title: "Aplikasi Kasir Kafe - Food",
-        //     render: food.view("edit"),
-        //     controller: function (params = null) {
-        //         return food.init("edit", params);
-        //     },
-        // },
+        "/admin/food": {
+            title: "Aplikasi Kasir Kafe - Food",
+            render: food.view("index"),
+            controller: function () {
+                return food.init("index");
+            },
+        },
+        "/admin/food/add": {
+            title: "Aplikasi Kasir Kafe - Add Food",
+            render: food.view("create"),
+            controller: function () {
+                return food.init("create");
+            },
+        },
+        "/admin/food/:id/edit": {
+            title: "Aplikasi Kasir Kafe - Edit Food",
+            render: food.view("edit"),
+            controller: function (params) {
+                return food.init("edit", params);
+            },
+        },
     },
     run: function (path) {
+        const navLinks = document.querySelectorAll(".nav-link");
+        const currUrl = window.location.pathname.split("/").pop();
+        navLinks.forEach((e) => {
+            e.classList.remove("active");
+            if (e.classList.contains(currUrl)) {
+                e.classList.add("active");
+            }
+        });
         const url = [];
         Object.keys(this.pages).forEach(function (key, index) {
             url.push(key);
@@ -69,6 +77,7 @@ const routing = {
             return match;
         });
         let route = this.pages[matchedRoute];
+
         if (route) {
             document.title = route.title;
             app.innerHTML = routeParams
