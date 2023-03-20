@@ -18,6 +18,7 @@ const food = {
         }
     },
     init: function (method, params = null) {
+        TOAST.classList.remove("bg-primary");
         switch (method) {
             case "index":
                 this.method.index();
@@ -45,7 +46,14 @@ const food = {
             dom: {
                 ConfirmDeleteModal: null,
                 deleteConfirmForm: null,
+                detailFoodModal: null,
                 inputs: null,
+                detail_food_name: null,
+                detail_food_categories: null,
+                detail_food_price: null,
+                detail_food_status: null,
+                detail_food_image: null,
+                detail_food_description: null,
             },
         },
         index: async function () {
@@ -131,6 +139,26 @@ const food = {
                     }
                 );
                 /*   END DELETE FOOD  */
+                /*   DETAIL FOOD  */
+                this.data.dom.detailFoodModal = new bootstrap.Modal(
+                    "#detailFoodModal"
+                );
+                this.data.dom.detail_food_name =
+                    document.querySelector("#detail_food_name");
+                this.data.dom.detail_food_categories = document.querySelector(
+                    "#detail_food_categories"
+                );
+                this.data.dom.detail_food_price =
+                    document.querySelector("#detail_food_price");
+                this.data.dom.detail_food_status = document.querySelector(
+                    "#detail_food_status"
+                );
+                this.data.dom.detail_food_image =
+                    document.querySelector("#detail_food_image");
+                this.data.dom.detail_food_description = document.querySelector(
+                    "#detail_food_description"
+                );
+                /*   END DETAIL FOOD  */
             } else {
                 APP_LOADING.cancel(this.data.loading);
                 TOAST_BODY.textContent = this.data.foodList.message;
@@ -177,7 +205,7 @@ const food = {
                         sortable: false,
                         render: function (data, cell, row) {
                             return `
-                            <button type="button" class="btn btn-info btn-sm detail" data-bs-toggle="modal" data-bs-target="#detailFoodModal">Detail</button>
+                            <button type="button" class="btn btn-info btn-sm detailFood">Detail</button>
                             <a href="/admin/food/${row.childNodes[0].textContent}/edit" class="btn btn-warning btn-sm" data-link>Edit</a>
                             <button type="button" class="btn btn-danger btn-sm deleteFood">Delete</button>
                             `;
@@ -213,6 +241,35 @@ const food = {
                     modalBody.innerHTML = `Do you want to remove <strong>${data[1]}</strong> from Food List ?`;
                     delete_id.value = data[0];
                     this.data.dom.ConfirmDeleteModal.show();
+                } else if (e.target.classList.contains("detailFood")) {
+                    const idx = e.target.parentNode.parentNode.dataIndex;
+                    const data = this.data.table.data[idx];
+                    this.data.dom.detail_food_name.value = data[1];
+                    this.data.dom.detail_food_categories.value = data[2];
+                    this.data.dom.detail_food_price.value =
+                        formatter.formatRupiah(data[3]);
+                    this.data.dom.detail_food_status.textContent = data[4];
+                    if (data[4] == "Tersedia") {
+                        this.data.dom.detail_food_status.classList.remove(
+                            "bg-danger"
+                        );
+                        this.data.dom.detail_food_status.classList.add(
+                            "bg-primary"
+                        );
+                    } else {
+                        this.data.dom.detail_food_status.classList.remove(
+                            "bg-primary"
+                        );
+                        this.data.dom.detail_food_status.classList.add(
+                            "bg-danger"
+                        );
+                    }
+                    this.data.dom.detail_food_image.setAttribute(
+                        "src",
+                        `${APP_STATE.assetUrl}images/foods/${data[6]}`
+                    );
+                    this.data.dom.detail_food_description.textContent = data[7];
+                    this.data.dom.detailFoodModal.show();
                 }
             });
         },

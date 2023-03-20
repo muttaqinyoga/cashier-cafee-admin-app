@@ -20,7 +20,7 @@ class FoodController extends Controller
     {
         $response = new Response();
         try {
-            $foodList = Food::with(['categories'])->get();
+            $foodList = Food::with(['categories'])->orderBy("foods.name")->get();
             $response->setStatus(true);
             $response->setMessage("success");
             $response->setData($foodList);
@@ -29,7 +29,9 @@ class FoodController extends Controller
             $response->setStatus(false);
             $response->setMessage("Something Went Wrong in the Server");
             $response->setHttpCode(500);
-            $response->setData(null);
+            $response->setData([
+                "Details" => $e->getMessage()
+            ]);
         }
         return $response->build();
     }

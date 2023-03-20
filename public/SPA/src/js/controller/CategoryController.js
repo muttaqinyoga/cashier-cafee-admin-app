@@ -12,6 +12,7 @@ const category = {
         }
     },
     init: function (method, params = null) {
+        TOAST.classList.remove("bg-success");
         switch (method) {
             case "index":
                 this.method.index();
