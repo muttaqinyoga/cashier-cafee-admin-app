@@ -1,7 +1,7 @@
 import home from "../views/home.js";
 import category from "../controller/CategoryController.js";
 import food from "../controller/FoodController.js";
-
+import order from "../controller/OrderController.js";
 const app = document.querySelector("#app");
 const routing = {
     pages: {
@@ -38,6 +38,13 @@ const routing = {
             render: food.view("edit"),
             controller: function (params) {
                 return food.init("edit", params);
+            },
+        },
+        "/admin/order": {
+            title: "Aplikasi Kasir Kafe - Order",
+            render: order.view("index"),
+            controller: function () {
+                return order.init("index");
             },
         },
     },

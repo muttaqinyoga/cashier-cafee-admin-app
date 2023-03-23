@@ -9,8 +9,4 @@ class Category extends Model
     // protected $table = 'categoru';
     public $incrementing = false;
     public $keyType = 'string';
-    public function food()
-    {
-        return $this->belongsToMany(Food::class);
-    }
 }

@@ -38,7 +38,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/api/admin/foods/{id}/get', [FoodController::class, 'getFoodById']);
     Route::post('/api/admin/foods/update', [FoodController::class, 'update']);
     Route::delete('/api/admin/foods/delete', [FoodController::class, 'delete']);
-    // Route::get('/admin/orders', [OrderController::class, 'index']);
-    // Route::get('/admin/orders/get', [OrderController::class, 'getListOrder']);
+    Route::get('/api/admin/orders/get', [OrderController::class, 'getListOrder']);
 });
 // Route::get('{path}', HomeController::class)->where('path', '(.*)');
