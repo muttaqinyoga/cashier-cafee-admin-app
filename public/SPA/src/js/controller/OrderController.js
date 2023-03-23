@@ -49,11 +49,10 @@ const food = {
             this.data.orderList = await this.getOrders();
             if (this.data.orderList.status) {
                 this.data.table.headings = [
-                    "Id",
                     "Order Number",
                     "Table Number",
                     "Total Bills",
-                    "Creation Date"
+                    "Creation Date",
                     "Status",
                     "Action",
                     "foods",
@@ -71,10 +70,10 @@ const food = {
                         this.data.orderList.data[i]["total_price"]
                     );
                     this.data.table.data[i].push(
-                        this.data.orderList.data[i]["status"]
+                        this.data.orderList.data[i]["created_at"]
                     );
                     this.data.table.data[i].push(
-                        this.data.orderList.data[i]["created_at"]
+                        this.data.orderList.data[i]["status"]
                     );
                     this.data.table.data[i].push(
                         this.data.orderList.data[i]["id"]
@@ -100,41 +99,12 @@ const food = {
                 data: data,
                 columns: [
                     {
-                        select: 4,
-                        render: function (data) {
-                            return data == "Proses"
-                                ? `<span class="badge rounded-pill bg-primary">${data}</span>`
-                                : `<span class="badge rounded-pill bg-danger">${data}</span>`;
-                        },
-                        sortable: true,
-                    },
-                    {
-                        select: 1,
-                        sortable: true,
-                    },
-                    {
                         select: 0,
                         sortable: false,
                     },
                     {
-                        select: 6,
-                        sortable: false,
-                        hidden: true,
-                    },
-                    {
-                        select: 2,
+                        select: 1,
                         sortable: true,
-                    },
-                    {
-                        select: ,
-                        sortable: false,
-                        render: function (data, cell, row) {
-                            return `
-                            <button type="button" class="btn btn-info btn-sm detailFood">Detail</button>
-                            <a href="/admin/food/${row.childNodes[0].textContent}/edit" class="btn btn-warning btn-sm" data-link>Edit</a>
-                            <button type="button" class="btn btn-danger btn-sm deleteFood">Delete</button>
-                            `;
-                        },
                     },
                     {
                         select: 2,
@@ -142,6 +112,51 @@ const food = {
                             return formatter.formatRupiah(data);
                         },
                         sortable: true,
+                    },
+                    {
+                        select: 3,
+                        sortable: true,
+                        render: function (data) {
+                            const date = new Date(data);
+                            return `${
+                                date.getDate() < 10
+                                    ? `0${date.getDate()}`
+                                    : date.getDate()
+                            }-${
+                                date.getMonth() < 10
+                                    ? `0${date.getMonth()}`
+                                    : date.getMonth()
+                            }-${date.getFullYear()}`;
+                        },
+                    },
+                    {
+                        select: 4,
+                        render: function (data) {
+                            return data == "Proses"
+                                ? `<span class="badge rounded-pill bg-primary">${data}</span>`
+                                : `<span class="badge rounded-pill bg-success">${data}</span>`;
+                        },
+                        sortable: true,
+                    },
+                    {
+                        select: 5,
+                        sortable: false,
+                        render: (data, cell, row) => {
+                            const status = row.childNodes[4].textContent;
+                            if (status === "Selesai") {
+                                return `<button type="button" class="btn btn-info btn-sm detailOrder">Detail</button>`;
+                            }
+                            return `
+                            <button type="button" class="btn btn-info btn-sm detailOrder">Detail</button>
+                            <a href="/admin/food/${data}/edit" class="btn btn-warning btn-sm" data-link>Edit</a>
+                            <button type="button" class="btn btn-danger btn-sm deleteOrder">Delete</button>
+                            `;
+                        },
+                    },
+                    {
+                        select: 6,
+                        sortable: false,
+                        hidden: true,
                     },
                 ],
                 perPage: 4,

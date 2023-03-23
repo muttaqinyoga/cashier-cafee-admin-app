@@ -19,6 +19,7 @@ class OrderController extends Controller
             $response->setMessage("success");
             $response->setData($orders);
             $response->setHttpCode(200);
+            return $response->build();
         } catch (Throwable $e) {
             $response->setStatus(false);
             $response->setMessage("Something Went Wrong in the Server");
@@ -26,7 +27,7 @@ class OrderController extends Controller
             $response->setData([
                 "Details" => $e->getMessage()
             ]);
+            return $response->build();
         }
-        return $response->build();
     }
 }
