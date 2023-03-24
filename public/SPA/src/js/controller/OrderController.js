@@ -42,6 +42,12 @@ const food = {
                 deleteConfirmForm: null,
                 detailOrderModal: null,
                 inputs: null,
+                detail_order_number: null,
+                detail_table_number: null,
+                detail_foods: null,
+                detail_total_price: null,
+                detail_created_at: null,
+                detail_status: null,
             },
         },
         index: async function () {
@@ -83,6 +89,24 @@ const food = {
                     );
                 }
                 this.initFoodTable(this.data.table);
+                this.data.dom.detailOrderModal = new bootstrap.Modal(
+                    "#detailOrderModal"
+                );
+                this.data.dom.detail_order_number = document.querySelector(
+                    "#detail_order_number"
+                );
+                this.data.dom.detail_table_number = document.querySelector(
+                    "#detail_table_number"
+                );
+                this.data.dom.detail_foods =
+                    document.querySelector("#detail_foods");
+                this.data.dom.detail_total_price = document.querySelector(
+                    "#detail_total_price"
+                );
+                this.data.dom.detail_created_at =
+                    document.querySelector("#detail_created_at");
+                this.data.dom.detail_status =
+                    document.querySelector("#detail_status");
                 APP_LOADING.cancel(this.data.loading);
             }
         },
@@ -166,48 +190,67 @@ const food = {
                 const thead = document.querySelector("#foodTables > thead");
                 thead.classList.add("table-dark");
             });
-            // foodTables.addEventListener("click", (e) => {
-            //     if (e.target.classList.contains("deleteFood")) {
-            //         const idx = e.target.parentNode.parentNode.dataIndex;
-            //         const data = this.data.table.data[idx];
-            //         const delete_id = document.querySelector("#delete_id");
-            //         const modalBody = document.querySelector(
-            //             "#ConfirmDeleteModal .modal-body"
-            //         );
-            //         modalBody.innerHTML = `Do you want to remove <strong>${data[1]}</strong> from Food List ?`;
-            //         delete_id.value = data[0];
-            //         this.data.dom.ConfirmDeleteModal.show();
-            //     } else if (e.target.classList.contains("detailFood")) {
-            //         const idx = e.target.parentNode.parentNode.dataIndex;
-            //         const data = this.data.table.data[idx];
-            //         this.data.dom.detail_food_name.value = data[1];
-            //         this.data.dom.detail_food_categories.value = data[2];
-            //         this.data.dom.detail_food_price.value =
-            //             formatter.formatRupiah(data[3]);
-            //         this.data.dom.detail_food_status.textContent = data[4];
-            //         if (data[4] == "Tersedia") {
-            //             this.data.dom.detail_food_status.classList.remove(
-            //                 "bg-danger"
-            //             );
-            //             this.data.dom.detail_food_status.classList.add(
-            //                 "bg-primary"
-            //             );
-            //         } else {
-            //             this.data.dom.detail_food_status.classList.remove(
-            //                 "bg-primary"
-            //             );
-            //             this.data.dom.detail_food_status.classList.add(
-            //                 "bg-danger"
-            //             );
-            //         }
-            //         this.data.dom.detail_food_image.setAttribute(
-            //             "src",
-            //             `${APP_STATE.assetUrl}images/foods/${data[6]}`
-            //         );
-            //         this.data.dom.detail_food_description.textContent = data[7];
-            //         this.data.dom.detailFoodModal.show();
-            //     }
-            // });
+            foodTables.addEventListener("click", (e) => {
+                if (e.target.classList.contains("deleteFood")) {
+                    const idx = e.target.parentNode.parentNode.dataIndex;
+                    const data = this.data.table.data[idx];
+                    const delete_id = document.querySelector("#delete_id");
+                    const modalBody = document.querySelector(
+                        "#ConfirmDeleteModal .modal-body"
+                    );
+                    modalBody.innerHTML = `Do you want to remove <strong>${data[1]}</strong> from Food List ?`;
+                    delete_id.value = data[0];
+                    this.data.dom.ConfirmDeleteModal.show();
+                } else if (e.target.classList.contains("detailOrder")) {
+                    const idx = e.target.parentNode.parentNode.dataIndex;
+                    const data = this.data.table.data[idx];
+                    this.data.dom.detail_order_number.value = data[0];
+                    this.data.dom.detail_table_number.value = data[1];
+                    this.data.dom.detail_total_price.value = data[2];
+                    const date = new Date(data[3]);
+                    const created_at = `${
+                        date.getDate() < 10
+                            ? `0${date.getDate()}`
+                            : date.getDate()
+                    }-${
+                        date.getMonth() < 10
+                            ? `0${date.getMonth()}`
+                            : date.getMonth()
+                    }-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+                    this.data.dom.detail_created_at.value = created_at;
+                    this.data.dom.detail_status.textContent = data[4];
+                    if (data[4] == "Selesai") {
+                        this.data.dom.detail_status.classList.remove(
+                            "bg-danger"
+                        );
+                        this.data.dom.detail_status.classList.add("bg-success");
+                    } else {
+                        this.data.dom.detail_status.classList.remove(
+                            "bg-success"
+                        );
+                        this.data.dom.detail_status.classList.add("bg-danger");
+                    }
+                    data[6].forEach((f) => {
+                        const li = document.createElement("li");
+                        li.textContent = `${f.name} (${formatter.formatRupiah(
+                            f.price
+                        )}) x ${f.pivot.quantity_ordered}pcs`;
+                        this.data.dom.detail_foods.appendChild(li);
+                    });
+                    this.data.dom.detailOrderModal.show();
+                    // this.data.dom.detail_food_name.value = data[1];
+                    // this.data.dom.detail_food_categories.value = data[2];
+                    // this.data.dom.detail_food_price.value =
+                    //     formatter.formatRupiah(data[3]);
+
+                    // this.data.dom.detail_food_image.setAttribute(
+                    //     "src",
+                    //     `${APP_STATE.assetUrl}images/foods/${data[6]}`
+                    // );
+                    // this.data.dom.detail_food_description.textContent = data[7];
+                    // this.data.dom.detailFoodModal.show();
+                }
+            });
         },
         create: async function () {
             this.data.loading = APP_LOADING.activate();

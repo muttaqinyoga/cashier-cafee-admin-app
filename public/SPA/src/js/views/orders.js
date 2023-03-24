@@ -25,45 +25,46 @@ export default () =>
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-info">
-                    <h5 class="modal-title" id="detailOrderModalLabel">Food Details</h5>
+                    <h5 class="modal-title" id="detailOrderModalLabel">Order Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3 row">
-                        <label for="detail_food_name" class="col-sm-3 col-form-label">Name</label>
+                        <label for="detail_order_number" class="col-sm-3 col-form-label">Order Number</label>
                         <div class="col-sm-9">
-                            <input type="text" readonly class="form-control-plaintext" id="detail_food_name">
+                            <input type="text" readonly class="form-control-plaintext" id="detail_order_number">
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label for="detail_food_categories" class="col-sm-3 col-form-label">Categories</label>
+                        <label for="detail_table_number" class="col-sm-3 col-form-label">Table Number</label>
                         <div class="col-sm-9">
-                            <input type="text" readonly class="form-control-plaintext" id="detail_food_categories">
+                            <input type="text" readonly class="form-control-plaintext" id="detail_table_number">
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label for="detail_food_price" class="col-sm-3 col-form-label">Price</label>
+                        <label for="detail_foods" class="col-sm-3 col-form-label">Menu List</label>
                         <div class="col-sm-9">
-                            <input type="text" readonly class="form-control-plaintext" id="detail_food_price">
+                            <ul class="form-control-plaintext" id="detail_foods">
+
+                            </ul>
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label for="detail_food_status" class="col-sm-3 col-form-label">Status</label>
+                        <label for="detail_total_price" class="col-sm-3 col-form-label">Total</label>
                         <div class="col-sm-9">
-                            <span class="form-control-plaintext badge rounded-pill" id="detail_food_status" ></span>
+                            <input type="text" readonly class="form-control-plaintext" id="detail_total_price">
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label for="detail_food_description" class="col-sm-3 col-form-label">Description</label>
+                        <label for="detail_created_at" class="col-sm-3 col-form-label">Created at</label>
                         <div class="col-sm-9">
-                            <textarea class="form-control-plaintext" id="detail_food_description" rows="3">
-                            </textarea>
+                            <input type="text" readonly class="form-control-plaintext" id="detail_created_at">
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label for="detail_food_image" class="col-sm-3 col-form-label">Image</label>
+                        <label for="detail_status" class="col-sm-3 col-form-label">Status</label>
                         <div class="col-sm-9">
-                            <img src="" class="form-control-plaintext img-fluid mx-auto d-block" alt="food" width="100" id ="detail_food_image">
+                            <span class="form-control-plaintext badge rounded-pill" id="detail_status" ></span>
                         </div>
                     </div>
                 </div>
