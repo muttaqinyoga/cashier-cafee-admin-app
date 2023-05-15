@@ -17,6 +17,7 @@ return new class extends Migration
         Schema::create('dining_tables', function (Blueprint $table) {
             $table->uuid('id')->primary()->default(DB::raw('uuid_generate_v4()'));
             $table->tinyInteger("number");
+            $table->enum('status', ['AVALIABLE', 'UNAVALIABLE'])->default('AVALIABLE');
             $table->timestamps();
         });
         DB::statement('ALTER TABLE dining_tables ALTER COLUMN id SET DEFAULT uuid_generate_v4();');

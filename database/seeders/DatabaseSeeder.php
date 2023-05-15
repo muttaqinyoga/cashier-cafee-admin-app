@@ -89,5 +89,12 @@ class DatabaseSeeder extends Seeder
         $orderDetail->order_id = $order1->id;
         $orderDetail->food_id = $food2->id;
         $orderDetail->save();
+
+        // Another Dining Table Seed
+        for ($i = 2; $i <= 20; $i++) {
+            DiningTables::create([
+                'number' => $i
+            ]);
+        }
     }
 }

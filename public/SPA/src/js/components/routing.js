@@ -47,6 +47,20 @@ const routing = {
                 return order.init("index");
             },
         },
+        "/admin/order/add": {
+            title: "Aplikasi Kasir Kafe - Create New Order",
+            render: order.view("create"),
+            controller: function () {
+                return order.init("create");
+            },
+        },
+        "/admin/order/:id/edit": {
+            title: "Aplikasi Kasir Kafe - Edit Order",
+            render: order.view("edit"),
+            controller: function (params) {
+                return order.init("edit", params);
+            },
+        },
     },
     run: function (path) {
         const navLinks = document.querySelectorAll(".nav-link");

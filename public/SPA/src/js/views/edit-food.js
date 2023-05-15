@@ -70,6 +70,7 @@ export default () =>
                             </div>
                             <div class="form-group mt-3">
                                 <button type="submit" class="form-control btn btn-warning">Update</button>
+                            </div>
                         </form>
                     </div>
                 </div>

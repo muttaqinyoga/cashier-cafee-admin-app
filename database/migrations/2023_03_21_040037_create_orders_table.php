@@ -16,9 +16,9 @@ return new class extends Migration
         DB::statement('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
         Schema::create('orders', function (Blueprint $table) {
             $table->uuid('id')->primary()->default(DB::raw('uuid_generate_v4()'));
-            $table->string('order_number');
+            $table->string('order_number')->unique();
             $table->float('total_price')->unsigned()->defaults(0);
-            $table->enum('status', ['Proses', 'Selesai']);
+            $table->enum('status', ['Proses', 'Selesai'])->default('Proses');
             $table->uuid('table_id');
             $table->timestamps();
             $table->foreign('table_id')->references('id')->on('dining_tables');

@@ -1,14 +1,17 @@
 import orders from "../views/orders.js";
+import addOrder from "../views/add-order.js";
+("../views/add-order.js");
 import formatter from "../components/utility/formatter.js";
 import routing from "../components/routing.js";
-
 const food = {
     view: function (page) {
         switch (page) {
             case "index":
                 return orders;
+            case "create":
+                return addOrder;
             default:
-                return foods;
+                return orders;
         }
     },
     init: function (method, params = null) {
@@ -29,12 +32,16 @@ const food = {
     },
     method: {
         data: {
-            payload: null,
             orderList: null,
             foodList: null,
+            diningTableList: null,
             table: {
                 headings: null,
                 data: null,
+            },
+            payload: {
+                order_food: [],
+                table_number: null,
             },
             loading: null,
             dom: {
@@ -48,6 +55,13 @@ const food = {
                 detail_total_price: null,
                 detail_created_at: null,
                 detail_status: null,
+                order_food: null,
+                food_ordered: null,
+                order_table_number: null,
+                addFoodOrderedForm: null,
+                addFoodOrderModal: null,
+                addOrderForm: null,
+                errorMessage: null,
             },
         },
         index: async function () {
@@ -172,7 +186,7 @@ const food = {
                             }
                             return `
                             <button type="button" class="btn btn-info btn-sm detailOrder">Detail</button>
-                            <a href="/admin/food/${data}/edit" class="btn btn-warning btn-sm" data-link>Edit</a>
+                            <a href="/admin/order/${data}/edit" class="btn btn-warning btn-sm" data-link>Edit</a>
                             <button type="button" class="btn btn-danger btn-sm deleteOrder">Delete</button>
                             `;
                         },
@@ -238,129 +252,184 @@ const food = {
                         this.data.dom.detail_foods.appendChild(li);
                     });
                     this.data.dom.detailOrderModal.show();
-                    // this.data.dom.detail_food_name.value = data[1];
-                    // this.data.dom.detail_food_categories.value = data[2];
-                    // this.data.dom.detail_food_price.value =
-                    //     formatter.formatRupiah(data[3]);
-
-                    // this.data.dom.detail_food_image.setAttribute(
-                    //     "src",
-                    //     `${APP_STATE.assetUrl}images/foods/${data[6]}`
-                    // );
-                    // this.data.dom.detail_food_description.textContent = data[7];
-                    // this.data.dom.detailFoodModal.show();
                 }
             });
         },
         create: async function () {
             this.data.loading = APP_LOADING.activate();
-            this.data.categories = await this.getCategories();
-            if (this.data.categories.status) {
-                const food_categories =
-                    document.querySelector("#food_categories");
-                this.data.categories.data.forEach((c) => {
+            if (this.data.payload.order_food.length < 1) {
+                this.data.dom.order_food =
+                    document.querySelector("#order_food");
+                this.data.dom.order_food.innerHTML = `<p class="form-control-plaintext">No Foods selected</p>`;
+            }
+
+            this.data.foodList = await this.getFoodList();
+            this.data.diningTableList = await this.getDiningTableList();
+            if (this.data.foodList.status && this.data.diningTableList.status) {
+                this.data.dom.food_ordered =
+                    document.querySelector("#food_ordered");
+                this.data.dom.order_table_number = document.querySelector(
+                    "#order_table_number"
+                );
+                this.data.foodList.data.forEach((f) => {
                     const option = document.createElement("option");
-                    option.value = c.id;
-                    option.textContent = c.name;
-                    food_categories.appendChild(option);
+                    option.value = f.id;
+                    option.textContent =
+                        f.name + " (" + formatter.formatRupiah(f.price) + ")";
+                    this.data.dom.food_ordered.appendChild(option);
+                });
+                this.data.diningTableList.data.forEach((t) => {
+                    const option = document.createElement("option");
+                    option.value = t.id;
+                    option.textContent = t.number;
+                    this.data.dom.order_table_number.appendChild(option);
                 });
                 APP_LOADING.cancel(this.data.loading);
-                this.data.payload = {
-                    food_categories: [],
-                };
                 this.data.dom.inputs = document.querySelectorAll("input");
-                this.data.dom.inputs.forEach(function (input) {
-                    input.addEventListener("input", function (e) {
+                this.data.dom.inputs.forEach((input) => {
+                    input.addEventListener("input", (e) => {
                         e.target.classList.remove("is-invalid");
                     });
                 });
-                const food_description =
-                    document.querySelector("#food_description");
-                food_description.value = null;
-
-                const selected_categories = document.querySelector(
-                    "#selected_categories"
+                this.data.dom.food_ordered.addEventListener("change", (e) => {
+                    e.target.classList.remove("is-invalid");
+                });
+                this.data.dom.addFoodOrderedForm = document.querySelector(
+                    "#addFoodOrderedForm"
                 );
-                if (this.data.payload.food_categories.length < 1) {
-                    selected_categories.innerHTML = `<small>No Category Selected</small>`;
-                }
-                food_categories.addEventListener("change", (e) => {
-                    const optSelected =
-                        e.target.options[e.target.selectedIndex];
-                    this.data.categories.data.forEach((c) => {
-                        if (c.id === optSelected.value) {
-                            this.data.payload.food_categories.push(
-                                optSelected.value
+                this.data.dom.addFoodOrderModal = new bootstrap.Modal(
+                    "#addFoodOrderModal"
+                );
+                this.data.dom.addFoodOrderedForm.addEventListener(
+                    "submit",
+                    (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.target);
+                        if (this.validate(formData)) {
+                            const opt = this.data.dom.food_ordered.options;
+                            const optSelected = opt[opt.selectedIndex];
+                            const li = document.createElement("li");
+                            li.className =
+                                "list-group-item d-flex justify-content-between align-items-start";
+                            const div = document.createElement("div");
+                            div.className = "ms-2 me-auto";
+                            div.innerHTML = `<div class="fw-bold">${
+                                optSelected.textContent
+                            }</div>
+                                                Quantity : ${formData.get(
+                                                    "food_ordered_quantity"
+                                                )}`;
+                            li.appendChild(div);
+                            const span = document.createElement("span");
+                            span.className =
+                                "badge bg-danger rounded-pill removeMenu";
+                            span.style.cursor = "pointer";
+                            span.textContent = "-";
+                            span.setAttribute("data-value", optSelected.value);
+                            span.setAttribute(
+                                "data-name",
+                                optSelected.textContent
                             );
-                            if (this.data.payload.food_categories.length <= 1) {
-                                selected_categories.firstChild.remove();
-                            }
-                            e.target.classList.remove("is-invalid");
-                            const small = document.createElement("small");
-                            small.innerHTML = `${optSelected.textContent} <span class="badge rounded-pill bg-danger category-choosed" value="${optSelected.value}" name="${optSelected.textContent}" style="cursor: pointer;" > x </span>`;
-                            selected_categories.appendChild(small);
-                            e.target.remove(e.target.selectedIndex);
-                        }
-                    });
-                });
-                selected_categories.addEventListener("click", (e) => {
-                    if (e.target.classList.contains("category-choosed")) {
-                        const idx = this.data.payload.food_categories.findIndex(
-                            (c) => c === e.target.getAttribute("value")
-                        );
-                        this.data.payload.food_categories.splice(idx, 1);
-                        selected_categories.removeChild(e.target.parentNode);
-                        if (this.data.payload.food_categories.length < 1) {
-                            selected_categories.innerHTML = `<small>No Category Selected</small>`;
-                        }
-                        const option = document.createElement("option");
-                        option.value = e.target.getAttribute("value");
-                        option.textContent = e.target.getAttribute("name");
-                        food_categories.appendChild(option);
-                    }
-                });
-                const addFoodForm = document.querySelector("#addFoodForm");
-                addFoodForm.addEventListener("submit", async (e) => {
-                    e.preventDefault();
-                    const foodFormData = new FormData(e.target);
-                    foodFormData.append(
-                        "food_categories",
-                        this.data.payload.food_categories
-                    );
-
-                    if (this.validate(foodFormData)) {
-                        this.data.loading = APP_LOADING.activate();
-                        TOAST.classList.remove("bg-success");
-                        TOAST.classList.remove("bg-danger");
-
-                        const saved = await this.store(foodFormData);
-                        if (!saved.status) {
-                            APP_LOADING.cancel(this.data.loading);
-                            const res = saved.data;
-                            TOAST.classList.add("bg-danger");
-                            if (res) {
-                                TOAST_BODY.innerHTML = "";
-                                const ul = document.createElement("ul");
-                                Object.keys(res.errors).forEach((key) => {
-                                    const li = document.createElement("li");
-                                    li.textContent = res.errors[key][0];
-                                    ul.appendChild(li);
-                                });
-                                TOAST_BODY.appendChild(ul);
+                            li.appendChild(span);
+                            if (this.data.payload.order_food < 1) {
+                                this.data.dom.order_food.firstChild.remove();
+                                const ul = document.createElement("ol");
+                                ul.className = "list-group list-group-numbered";
+                                ul.id = "listFoodOrder";
+                                ul.appendChild(li);
+                                this.data.dom.order_food.appendChild(ul);
                             } else {
-                                TOAST_BODY.textContent = saved.message;
+                                const listFoodOrder =
+                                    document.querySelector("#listFoodOrder");
+                                listFoodOrder.appendChild(li);
                             }
-                            TOAST_APP.show();
+                            this.data.payload.order_food.push({
+                                food: optSelected.value,
+                                quantity_ordered: formData.get(
+                                    "food_ordered_quantity"
+                                ),
+                            });
+                            this.data.dom.addFoodOrderModal.hide();
+                            this.data.dom.food_ordered.remove(
+                                opt.selectedIndex
+                            );
+                        }
+                    }
+                );
+
+                this.data.dom.order_food.addEventListener("click", (e) => {
+                    if (e.target.classList.contains("removeMenu")) {
+                        const idx = this.data.payload.order_food.findIndex(
+                            (i) =>
+                                i.food === e.target.getAttribute("data-value")
+                        );
+                        this.data.payload.order_food.splice(idx, 1);
+                        const option = document.createElement("option");
+                        option.value = e.target.getAttribute("data-value");
+                        option.textContent = e.target.getAttribute("data-name");
+                        this.data.dom.food_ordered.append(option);
+                        if (this.data.payload.order_food.length < 1) {
+                            this.data.dom.order_food.innerHTML = `<p class="form-control-plaintext">No Foods selected</p>`;
                         } else {
-                            APP_LOADING.cancel(this.data.loading);
-                            TOAST_BODY.textContent = saved.message;
-                            TOAST.classList.add("bg-success");
-                            TOAST_APP.show();
-                            history.pushState("", "", "/admin/food");
-                            routing.run("/admin/food");
+                            const listFoodOrder =
+                                document.querySelector("#listFoodOrder");
+                            const li = e.target.parentNode;
+                            listFoodOrder.removeChild(li);
                         }
                     }
                 });
+                const order_table_number = document.querySelector(
+                    "#order_table_number"
+                );
+                order_table_number.addEventListener("change", (e) => {
+                    e.target.classList.remove("is-invalid");
+                });
+                this.data.dom.addOrderForm =
+                    document.querySelector("#addOrderForm");
+                this.data.dom.errorMessage =
+                    document.querySelector("#errorMessage");
+                this.data.dom.addOrderForm.addEventListener(
+                    "submit",
+                    async (e) => {
+                        e.preventDefault();
+                        const orderFormData = new FormData(e.target);
+                        orderFormData.append(
+                            "order_food",
+                            JSON.stringify(this.data.payload.order_food)
+                        );
+                        if (this.validate(orderFormData)) {
+                            this.data.loading = APP_LOADING.activate();
+                            const ordered = await this.store(orderFormData);
+
+                            if (!ordered.status) {
+                                TOAST.classList.remove("bg-success");
+                                TOAST.classList.add("bg-danger");
+                                const res = ordered.data;
+                                if (res.errors) {
+                                    TOAST_BODY.innerHTML = "";
+                                    const ul = document.createElement("ul");
+                                    Object.keys(res.errors).forEach((key) => {
+                                        const li = document.createElement("li");
+                                        li.textContent = res.errors[key][0];
+                                        ul.appendChild(li);
+                                    });
+                                    TOAST_BODY.appendChild(ul);
+                                } else {
+                                    TOAST_BODY.textContent = ordered.message;
+                                }
+                                TOAST_APP.show();
+                                APP_LOADING.cancel(this.data.loading);
+                            } else {
+                                APP_LOADING.cancel(this.data.loading);
+                                TOAST_BODY.textContent = ordered.message;
+                                TOAST.classList.add("bg-success");
+                                TOAST_APP.show();
+                                history.pushState("", "", "/admin/order");
+                                routing.run("/admin/order");
+                            }
+                        }
+                    }
+                );
             } else {
                 APP_LOADING.cancel(this.data.loading);
                 TOAST_BODY.textContent = this.data.foodList.message;
@@ -371,7 +440,7 @@ const food = {
         },
         edit: async function (params) {
             this.data.loading = APP_LOADING.activate();
-            this.data.categories = await this.getCategories();
+            this.data.categories = await this.getFoodList();
             const food = await this.getFoodById(params);
             if (this.data.categories.status && food.status) {
                 this.data.payload = {
@@ -572,8 +641,21 @@ const food = {
                     return res;
                 });
         },
-        getCategories: function () {
-            return fetch(`${APP_STATE.baseUrl}/api/admin/categories/get`)
+        getFoodList: function () {
+            return fetch(
+                `${APP_STATE.baseUrl}/api/admin/orders?${new URLSearchParams({
+                    list: "food",
+                })}`
+            )
+                .then((response) => {
+                    return response.json();
+                })
+                .then((res) => {
+                    return res;
+                });
+        },
+        getDiningTableList: function () {
+            return fetch(`${APP_STATE.baseUrl}/api/admin/tables/get`)
                 .then((response) => {
                     return response.json();
                 })
@@ -602,6 +684,16 @@ const food = {
                         return false;
                     }
                 }
+                if (pair[0] === "order_food" && !pair[1]) {
+                    this.data.dom.errorMessage.innerHTML = `
+                    <div class="alert alert-danger alert-dismissible fade show " role="alert" >
+                        <strong>Choose at least 1 menu</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>         
+                    </div>`;
+
+                    this.data.dom.errorMessage.classList.remove("d-none");
+                    return false;
+                }
                 if (
                     !pair[1] &&
                     pair[1].name != "" &&
@@ -620,7 +712,7 @@ const food = {
             return true;
         },
         store: function (payload) {
-            return fetch(`${APP_STATE.baseUrl}/api/admin/foods/save`, {
+            return fetch(`${APP_STATE.baseUrl}/api/admin/orders/save`, {
                 method: "POST",
                 headers: {
                     accept: "application/json",

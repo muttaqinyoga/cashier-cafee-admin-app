@@ -39,5 +39,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/api/admin/foods/update', [FoodController::class, 'update']);
     Route::delete('/api/admin/foods/delete', [FoodController::class, 'delete']);
     Route::get('/api/admin/orders/get', [OrderController::class, 'getListOrder']);
+    Route::get('/api/admin/orders', [OrderController::class, 'getListFood']);
+    Route::get('/api/admin/tables/get', [OrderController::class, 'getDiningTables']);
+    Route::post('/api/admin/orders/save', [OrderController::class, 'save']);
 });
 // Route::get('{path}', HomeController::class)->where('path', '(.*)');

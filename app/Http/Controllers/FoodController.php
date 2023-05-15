@@ -92,7 +92,6 @@ class FoodController extends Controller
             } else {
                 $newFood->image = self::DEFAULT_IMAGE_FOOD;
             }
-            $newFood->status_stock = "Tidak Tersedia";
             $newFood->save();
             $newFood->categories()->attach($reqCategories);
             DB::commit();
