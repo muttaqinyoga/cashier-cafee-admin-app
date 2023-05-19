@@ -71,7 +71,6 @@ const food = {
             this.data.loading = APP_LOADING.activate();
             this.data.orderList = await this.getOrders();
             if (this.data.orderList.status) {
-                console.log(this.data.orderList);
                 this.data.table.headings = [
                     "Order Number",
                     "Table Number",
@@ -80,6 +79,7 @@ const food = {
                     "Status",
                     "Action",
                     "foods",
+                    "payment",
                 ];
                 this.data.table.data = [];
                 for (let i = 0; i < this.data.orderList.data.length; i++) {
@@ -104,6 +104,9 @@ const food = {
                     );
                     this.data.table.data[i].push(
                         this.data.orderList.data[i]["foods"]
+                    );
+                    this.data.table.data[i].push(
+                        this.data.orderList.data[i]["payment_code"]
                     );
                 }
                 this.initFoodTable(this.data.table);
@@ -215,12 +218,18 @@ const food = {
                             return `
                             <button type="button" class="btn btn-info btn-sm detailOrder">Detail</button>
                             <a href="/admin/order/${data}/edit" class="btn btn-warning btn-sm" data-link>Edit</a>
+                            <button type="button" class="btn btn-success btn-sm finishOrder">Finish</button>
                             <button type="button" class="btn btn-danger btn-sm deleteOrder">Cancel</button>
                             `;
                         },
                     },
                     {
                         select: 6,
+                        sortable: false,
+                        hidden: true,
+                    },
+                    {
+                        select: 7,
                         sortable: false,
                         hidden: true,
                     },
@@ -250,7 +259,8 @@ const food = {
 
                     this.data.dom.detail_order_number.value = data[0];
                     this.data.dom.detail_table_number.value = data[1];
-                    this.data.dom.detail_total_price.value = data[2];
+                    this.data.dom.detail_total_price.value =
+                        formatter.formatRupiah(data[2]);
                     const date = new Date(data[3]);
                     const created_at = `${
                         date.getDate() < 10
@@ -282,8 +292,43 @@ const food = {
                         this.data.dom.detail_foods.appendChild(li);
                     });
                     this.data.dom.detailOrderModal.show();
+                } else if (e.target.classList.contains("finishOrder")) {
+                    const finishOrderModal = new bootstrap.Modal(
+                        "#finishOrderModal"
+                    );
+                    const finishOrderModalBody = document.querySelector(
+                        "#finishOrderModal .modal-body"
+                    );
+                    const payment_order_id =
+                        document.querySelector("#payment_order_id");
+                    const idx = e.target.parentNode.parentNode.dataIndex;
+                    const data = this.data.table.data[idx];
+                    payment_order_id.value = data[7];
+                    finishOrderModalBody.innerHTML = `Do you want to finish <strong>${data[0]}</strong> Order's ? This will create a payment for this order`;
+                    initPaid(data[2]);
+                    finishOrderModal.show();
+                    this.initSubmitPayment(
+                        payment_order_id.value,
+                        finishOrderModal
+                    );
                 }
             });
+
+            function initPaid(mustPaid) {
+                const paidMoney = document.querySelector("#paidMoney");
+                const returnMoney = document.querySelector("#returnMoney");
+                paidMoney.addEventListener("input", () => {
+                    const returnPaid =
+                        parseInt(paidMoney.value) - parseInt(mustPaid);
+                    if (returnPaid < 0) {
+                        returnMoney.value = "Not enough paid";
+                    } else {
+                        returnMoney.value = formatter.formatRupiah(
+                            returnPaid.toString()
+                        );
+                    }
+                });
+            }
         },
         create: async function () {
             this.data.payload.order_food = [];
@@ -513,7 +558,12 @@ const food = {
                             span.style.cursor = "pointer";
                             span.textContent = "-";
                             span.setAttribute("data-value", of.id);
-                            span.setAttribute("data-name", of.name);
+                            span.setAttribute(
+                                "data-name",
+                                `${of.name} (${formatter.formatRupiah(
+                                    of.price
+                                )})`
+                            );
                             li.appendChild(span);
                             ul.appendChild(li);
                             this.data.dom.order_food.appendChild(ul);
@@ -626,7 +676,6 @@ const food = {
                         );
 
                         this.data.payload.order_food.splice(idx, 1);
-                        console.log(this.data.payload.order_food);
                         const option = document.createElement("option");
                         option.value = e.target.getAttribute("data-value");
                         option.textContent = e.target.getAttribute("data-name");
@@ -703,6 +752,36 @@ const food = {
                 TOAST_APP.show();
             }
         },
+        initSubmitPayment: async function (payment_order_id, modal) {
+            const finishOrderForm = document.querySelector("#finishOrderForm");
+            finishOrderForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                if (payment_order_id) {
+                    this.data.loading = APP_LOADING.activate();
+                    modal.hide();
+                    TOAST.classList.remove("bg-success");
+                    TOAST.classList.remove("bg-danger");
+                    const paymentFormData = new FormData();
+                    paymentFormData.append("_token", APP_STATE.csrf);
+                    paymentFormData.append("payment_code", payment_order_id);
+                    const finished = await this.finishOrder(paymentFormData);
+                    if (!finished.status) {
+                        APP_LOADING.cancel(this.data.loading);
+                        TOAST.classList.add("bg-danger");
+                        TOAST_BODY.textContent = finished.message;
+                        TOAST_APP.show();
+                    } else {
+                        APP_LOADING.cancel(this.data.loading);
+                        TOAST_BODY.textContent = finished.message;
+                        TOAST.classList.add("bg-success");
+                        TOAST_APP.show();
+                        routing.run("/admin/order");
+                    }
+                } else {
+                    document.location.href = location.href;
+                }
+            });
+        },
         getOrders: function () {
             return fetch(`${APP_STATE.baseUrl}/api/admin/orders/get`)
                 .then((response) => {
@@ -717,6 +796,20 @@ const food = {
                 .then((response) => {
                     return response.json();
                 })
+                .then((res) => {
+                    return res;
+                });
+        },
+        finishOrder: function (payload) {
+            return fetch(`${APP_STATE.baseUrl}/api/admin/orders/finish`, {
+                method: "POST",
+                headers: {
+                    accept: "application/json",
+                },
+                credentials: "same-origin",
+                body: payload,
+            })
+                .then((response) => response.json())
                 .then((res) => {
                     return res;
                 });

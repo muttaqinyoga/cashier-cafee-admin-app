@@ -45,5 +45,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/api/admin/orders/{id}/get', [OrderController::class, 'getOrderById']);
     Route::post('/api/admin/orders/update', [OrderController::class, 'update']);
     Route::delete('/api/admin/orders/delete', [OrderController::class, 'delete']);
+    Route::post('/api/admin/orders/finish', [OrderController::class, 'finish']);
 });
 // Route::get('{path}', HomeController::class)->where('path', '(.*)');

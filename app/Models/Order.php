@@ -9,9 +9,9 @@ class Order extends Model
     public $incrementing = false;
     public $keyType = 'string';
 
-    public function  foods()
+    public function foods()
     {
-        return $this->belongsToMany(Food::class, "order_details")->withPivot("quantity_ordered");
+        return $this->belongsToMany(Food::class, "order_details")->withPivot('quantity_ordered');
     }
 
     public function getTotalQuantity()

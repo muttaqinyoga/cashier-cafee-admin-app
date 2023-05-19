@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\Crypt;
 use Validator;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -17,6 +18,19 @@ use Throwable;
 class OrderController extends Controller
 {
 
+
+    function encryptOrder($orders)
+    {
+        foreach ($orders as $order) {
+            if ($order['status'] == 'Proses') {
+                $order['payment_code'] = Crypt::encryptString($order['id']);
+            } else {
+                $order['payment_code'] = null;
+            }
+        }
+
+        return $orders;
+    }
     public function getListOrder()
     {
         $response = new Response();
@@ -24,7 +38,8 @@ class OrderController extends Controller
             $orders = Order::with(["table", "foods"])->get();
             $response->setStatus(true);
             $response->setMessage("success");
-            $response->setData($orders);
+            $order_map = $this->encryptOrder($orders);
+            $response->setData($order_map);
             $response->setHttpCode(200);
             return $response->build();
         } catch (Throwable $e) {
@@ -257,10 +272,7 @@ class OrderController extends Controller
             $curr_dinning_table = DiningTables::findOrFail($order->table_id);
             $curr_dinning_table->status = 'AVALIABLE';
             $curr_dinning_table->update();
-            foreach ($order->foods() as $of) {
-                $order_details = OrderDetails::where('order_id', '=', $order->id)->firstOrFail();
-                $order_details->delete();
-            }
+            $order->foods()->detach();
             foreach ($foods as $f) {
                 foreach ($order_food as $of) {
                     if ($f->id == $of['food']) {
@@ -312,8 +324,8 @@ class OrderController extends Controller
 
     public function delete(Request $request)
     {
-        DB::beginTransaction();
         $response = new Response();
+        DB::beginTransaction();
         try {
             $order = Order::findOrFail($request->delete_id);
             $order->foods()->detach();
@@ -327,10 +339,47 @@ class OrderController extends Controller
             $response->setData(null);
             $response->setHttpCode(200);
             return $response->build();
-        } catch (ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $m) {
             DB::rollBack();
             $response->setStatus(false);
             $response->setMessage("Could not delete requested data");
+            $response->setHttpCode(400);
+            $response->setData(null);
+            return $response->build();
+        } catch (Throwable $e) {
+            DB::rollBack();
+            $response->setStatus(false);
+            $response->setMessage("Something Went Wrong in the Server");
+            $response->setHttpCode(500);
+            $response->setData([
+                "Details" => $e->getMessage()
+            ]);
+            return $response->build();
+        }
+    }
+
+    public function finish(Request $request)
+    {
+        $response = new Response();
+        $paymentCode = Crypt::decryptString($request->payment_code);
+        DB::beginTransaction();
+        try {
+            $order = Order::findOrFail($paymentCode);
+            $table = DiningTables::findOrFail($order->table_id);
+            $order->status = 'Selesai';
+            $table->status = 'AVALIABLE';
+            $order->update();
+            $table->update();
+            DB::commit();
+            $response->setStatus(true);
+            $response->setMessage("$order->order_number has been finished");
+            $response->setData(null);
+            $response->setHttpCode(200);
+            return $response->build();
+        } catch (ModelNotFoundException $m) {
+            DB::rollBack();
+            $response->setStatus(false);
+            $response->setMessage("Could not process request");
             $response->setHttpCode(400);
             $response->setData(null);
             return $response->build();
