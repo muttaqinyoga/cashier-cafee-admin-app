@@ -81,12 +81,19 @@ export default () =>
                         <label for="detail_total_price" class="col-sm-3 col-form-label">Total</label>
                         <div class="col-sm-9">
                             <input type="text" readonly class="form-control-plaintext" id="detail_total_price">
+                            <small class="text-danger">* Total order could be different from current total foods ordered due to some food has been updated</small>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="detail_created_at" class="col-sm-3 col-form-label">Created at</label>
                         <div class="col-sm-9">
                             <input type="text" readonly class="form-control-plaintext" id="detail_created_at">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="finished_at" class="col-sm-3 col-form-label">Finished at</label>
+                        <div class="col-sm-9">
+                            <input type="text" readonly class="form-control-plaintext" id="finished_at">
                         </div>
                     </div>
                     <div class="mb-3 row">
