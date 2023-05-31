@@ -75,20 +75,20 @@ class DatabaseSeeder extends Seeder
         $tables1->number = 1;
         $tables1->save();
         // Order Food
-        $order1 = new Order;
-        $order1->id = Uuid::uuid4()->getHex();
-        $order1->order_number = date('YmdHis');
-        $order1->total_price = 23000.00;
-        $order1->status = "Selesai";
-        $order1->table_id = $tables1->id;
-        $order1->save();
-        // Order Details 
-        $orderDetail = new OrderDetails;
-        $orderDetail->id = Uuid::uuid4()->getHex();
-        $orderDetail->quantity_ordered = 1;
-        $orderDetail->order_id = $order1->id;
-        $orderDetail->food_id = $food2->id;
-        $orderDetail->save();
+        // $order1 = new Order;
+        // $order1->id = Uuid::uuid4()->getHex();
+        // $order1->order_number = date('YmdHis');
+        // $order1->total_price = 23000.00;
+        // $order1->status = "Selesai";
+        // $order1->table_id = $tables1->id;
+        // $order1->save();
+        // // Order Details 
+        // $orderDetail = new OrderDetails;
+        // $orderDetail->id = Uuid::uuid4()->getHex();
+        // $orderDetail->quantity_ordered = 1;
+        // $orderDetail->order_id = $order1->id;
+        // $orderDetail->food_id = $food2->id;
+        // $orderDetail->save();
 
         // Another Dining Table Seed
         for ($i = 2; $i <= 20; $i++) {

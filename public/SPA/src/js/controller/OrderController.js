@@ -80,6 +80,7 @@ const food = {
                     "Action",
                     "foods",
                     "payment",
+                    "finished_at",
                 ];
                 this.data.table.data = [];
                 for (let i = 0; i < this.data.orderList.data.length; i++) {
@@ -107,6 +108,9 @@ const food = {
                     );
                     this.data.table.data[i].push(
                         this.data.orderList.data[i]["payment_code"]
+                    );
+                    this.data.table.data[i].push(
+                        this.data.orderList.data[i]["updated_at"]
                     );
                 }
                 this.initFoodTable(this.data.table);
@@ -233,6 +237,11 @@ const food = {
                         sortable: false,
                         hidden: true,
                     },
+                    {
+                        select: 8,
+                        sortable: false,
+                        hidden: true,
+                    },
                 ],
                 perPage: 4,
                 perPageSelect: [4, 10, 20, 50],
@@ -255,6 +264,7 @@ const food = {
                 } else if (e.target.classList.contains("detailOrder")) {
                     const idx = e.target.parentNode.parentNode.dataIndex;
                     const data = this.data.table.data[idx];
+
                     this.data.dom.detail_foods.innerHTML = "";
 
                     this.data.dom.detail_order_number.value = data[0];
@@ -262,16 +272,25 @@ const food = {
                     this.data.dom.detail_total_price.value =
                         formatter.formatRupiah(data[2]);
                     const date = new Date(data[3]);
-                    const created_at = `${
-                        date.getDate() < 10
-                            ? `0${date.getDate()}`
-                            : date.getDate()
-                    }-${
-                        date.getMonth() < 10
-                            ? `0${date.getMonth()}`
-                            : date.getMonth()
-                    }-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+                    const created_at =
+                        date.toLocaleDateString() +
+                        " " +
+                        date.toLocaleTimeString();
                     this.data.dom.detail_created_at.value = created_at;
+                    const finished_at = document.querySelector("#finished_at");
+                    const dateFinishedAt = new Date(data[8]);
+                    if (
+                        date.toLocaleTimeString() ==
+                        dateFinishedAt.toLocaleTimeString()
+                    ) {
+                        finished_at.value = "-";
+                    } else {
+                        finished_at.value =
+                            date.toLocaleDateString() +
+                            " " +
+                            dateFinishedAt.toLocaleTimeString();
+                    }
+
                     this.data.dom.detail_status.textContent = data[4];
                     if (data[4] == "Selesai") {
                         this.data.dom.detail_status.classList.remove(
@@ -660,7 +679,6 @@ const food = {
                                     "food_ordered_quantity"
                                 ),
                             });
-                            console.log(this.data.payload.order_food);
                             this.data.dom.addFoodOrderModal.hide();
                             this.data.dom.food_ordered.remove(
                                 opt.selectedIndex
