@@ -1,0 +1,57 @@
+{
+    "status" : true,
+    "data" : [
+        {
+            "id": "food_1",
+            "name": "Nasi Goreng Ayam",
+            "price": 14000,
+            "img": "foods-placeholder.jpg",
+            "categories": [
+                {
+                    "id" : "category_1",
+                    "name" : "Aneka Nasi"
+                }
+            ]
+        },
+        {
+            "id": "food_2",
+            "name": "Nasi Ayam Bakar",
+            "price": 16000,
+            "img": "foods-placeholder.jpg",
+            "categories": [
+                {
+                    "id" : "category_1",
+                    "name" : "Aneka Nasi"
+                },
+                {
+                    "id" : "category_2",
+                    "name" : "Aneka Ayam"
+                }
+            ]
+        },
+        {
+            "id": "food_3",
+            "name": "Teh Manis Dingin",
+            "price": 6000,
+            "img": "foods-placeholder.jpg",
+            "categories": [
+                {
+                    "id" : "category_3",
+                    "name" : "Soft Drink"
+                }
+            ]
+        },
+        {
+            "id": "food_4",
+            "name": "Capucino Dingin",
+            "price": 8000,
+            "img": "foods-placeholder.jpg",
+            "categories": [
+                {
+                    "id" : "category_4",
+                    "name" : "Kopi"
+                }
+            ]
+        }
+    ]
+}

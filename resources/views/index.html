@@ -1,204 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Muttaqin Cafe</title>
-    <link rel="stylesheet" href="bootstrap-material.css" />
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="card mt-2">
-            <div class="card-header">
-              <div class="row mb-2">
-                <div class="col-sm-12">
-                  <h4 class="card-title">Selamat Datang di Muttaqin Cafe</h4>
-                  <p class="card-subtitle text-muted">
-                    Silahkan pesan makanan yang ada di bawah ini
-                  </p>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Muttaqin Cafe</title>
+        <link rel="stylesheet" href="bootstrap-material.css" />
+    </head>
+    <body>
+        <main>
+            <section class="py-3 text-center container bg-light">
+                <div class="row py-lg-2">
+                    <div class="col-lg-6 col-md-8 mx-auto">
+                        <h3 class="fw-bold text-dark">MTQ CAFE</h3>
+                        <p class="text-muted">
+                            Silahkan pesan makanan yang ada di bawah ini
+                        </p>
+                        <ul class="nav nav-pills nav-justified" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a
+                                    class="nav-link active"
+                                    data-bs-toggle="tab"
+                                    href="#menu"
+                                    role="tab"
+                                    >Menu</a
+                                >
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a
+                                    class="nav-link dropdown-toggle"
+                                    data-bs-toggle="dropdown"
+                                    href="#"
+                                    role="button"
+                                    aria-expanded="false"
+                                    >Kategori</a
+                                >
+                                <ul class="dropdown-menu">
+                                    <li list-value="">
+                                        <a class="dropdown-item active" href="#"
+                                            >Semua</a
+                                        >
+                                    </li>
+                                    <li list-value="category_1">
+                                        <a class="dropdown-item" href="#"
+                                            >Aneka Nasi</a
+                                        >
+                                    </li>
+                                    <li list-value="category_3">
+                                        <a class="dropdown-item" href="#"
+                                            >Soft Drink</a
+                                        >
+                                    </li>
+                                    <li list-value="category_4">
+                                        <a class="dropdown-item" href="#"
+                                            >Kopi</a
+                                        >
+                                    </li>
+                                </ul>
+                            </li>
+                            <li
+                                class="nav-item position-relative"
+                                id="cartComponent"
+                            >
+                                <a
+                                    class="nav-link"
+                                    data-bs-toggle="tab"
+                                    href="#cart"
+                                    role="tab"
+                                    >Cart</a
+                                >
+                                <span
+                                    id="notifCart"
+                                    class="position-absolute top-0 translate-middle p-2 bg-warning border border-light rounded-circle d-none"
+                                >
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-sm-12">
-                  <ul class="nav nav-pills nav-justified">
-                    <li class="nav-item">
-                      <a class="nav-link active" aria-current="page" href="#"
-                        >Menu</a
-                      >
-                    </li>
-                    <li class="nav-item dropdown">
-                      <a
-                        class="nav-link dropdown-toggle"
-                        data-bs-toggle="dropdown"
-                        href="#"
-                        role="button"
-                        aria-expanded="false"
-                        >Filter</a
-                      >
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li>
-                          <a class="dropdown-item" href="#">Another action</a>
-                        </li>
-                        <li>
-                          <a class="dropdown-item" href="#"
-                            >Something else here</a
-                          >
-                        </li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li>
-                          <a class="dropdown-item" href="#">Separated link</a>
-                        </li>
-                      </ul>
-                    </li>
-                    <li class="nav-item position-relative" id="cart">
-                      <a class="nav-link" href="#">Cart</a>
-                      <span
-                        id="notifCart"
-                        class="position-absolute top-0 translate-middle p-2 bg-warning border border-light rounded-circle d-none"
-                      >
-                        <span class="visually-hidden">New alerts</span>
-                      </span>
-                    </li>
-                  </ul>
+            </section>
+
+            <div class="gallery py-3">
+                <div class="container">
+                    <div class="tab-content" id="myTabContent">
+                        <div
+                            class="tab-pane fade show active"
+                            id="menu"
+                            role="tabpanel"
+                        >
+                            <div
+                                class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3"
+                            ></div>
+                        </div>
+                        <div
+                            class="tab-pane fade"
+                            id="cart"
+                            role="tabpanel"
+                        ></div>
+                    </div>
                 </div>
-              </div>
             </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-sm-3">
-                  <div class="card m-1">
-                    <img
-                      src="foods-placeholder.jpg"
-                      class="card-img-top"
-                      height="150px"
-                    />
-                    <div class="card-body">
-                      <h5 class="card-title">Nasi Goreng Suir Ayam</h5>
-                      <span class="badge text-bg-success card-subtitle"
-                        >Rp. 15000</span
-                      >
-
-                      <div class="add-menu">
-                        <span
-                          class="badge rounded-pill text-bg-warning addFood"
-                          style="cursor: pointer"
-                          >+</span
-                        >
-                        <span
-                          class="badge rounded-pill text-bg-danger d-none removeFood"
-                          style="cursor: pointer"
-                          >-</span
-                        >
-                        <span
-                          class="badge rounded-pill text-bg-dark countAddedFood"
-                        ></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-3">
-                  <div class="card m-1">
-                    <img
-                      src="foods-placeholder.jpg"
-                      class="card-img-top"
-                      height="150px"
-                    />
-                    <div class="card-body">
-                      <h5 class="card-title">Nasi Ayam Bakar</h5>
-                      <span class="badge text-bg-success card-subtitle"
-                        >Rp. 16000</span
-                      >
-                      <div class="add-menu">
-                        <span
-                          class="badge rounded-pill text-bg-warning addFood"
-                          style="cursor: pointer"
-                          >+</span
-                        >
-                        <span
-                          class="badge rounded-pill text-bg-danger d-none removeFood"
-                          style="cursor: pointer"
-                          >-</span
-                        >
-                        <span
-                          class="badge rounded-pill text-bg-dark countAddedFood"
-                        ></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-3">
-                  <div class="card m-1">
-                    <img
-                      src="foods-placeholder.jpg"
-                      class="card-img-top"
-                      height="150px"
-                    />
-                    <div class="card-body">
-                      <h5 class="card-title">Nasi Goreng Suir Ayam</h5>
-                      <span class="badge text-bg-success card-subtitle"
-                        >Rp. 15000</span
-                      >
-
-                      <div class="add-menu">
-                        <span
-                          class="badge rounded-pill text-bg-warning addFood"
-                          style="cursor: pointer"
-                          >+</span
-                        >
-                        <span
-                          class="badge rounded-pill text-bg-danger d-none removeFood"
-                          style="cursor: pointer"
-                          >-</span
-                        >
-                        <span
-                          class="badge rounded-pill text-bg-dark countAddedFood"
-                        ></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-3">
-                  <div class="card m-1">
-                    <img
-                      src="foods-placeholder.jpg"
-                      class="card-img-top"
-                      height="150px"
-                    />
-                    <div class="card-body">
-                      <h5 class="card-title">Nasi Ayam Bakar</h5>
-                      <span class="badge text-bg-success card-subtitle"
-                        >Rp. 16000</span
-                      >
-                      <div class="add-menu">
-                        <span
-                          class="badge rounded-pill text-bg-warning addFood"
-                          style="cursor: pointer"
-                          >+</span
-                        >
-                        <span
-                          class="badge rounded-pill text-bg-danger d-none removeFood"
-                          style="cursor: pointer"
-                          >-</span
-                        >
-                        <span
-                          class="badge rounded-pill text-bg-dark countAddedFood"
-                        ></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <script src="bootstrap.js"></script>
-    <script src="app.js"></script>
-  </body>
+        </main>
+        <footer class="text-muted py-3 bg-light text-center">
+            <p id="textYear"></p>
+        </footer>
+        <script src="bootstrap.js"></script>
+        <script src="app.js"></script>
+    </body>
 </html>
