@@ -281,7 +281,7 @@ const food = {
                     const dateFinishedAt = new Date(data[8]);
                     if (
                         date.toLocaleTimeString() ==
-                        dateFinishedAt.toLocaleTimeString()
+                        dateFinishedAt.toLocaleTimeString() || data[4] != "Selesai"
                     ) {
                         finished_at.value = "-";
                     } else {
@@ -364,9 +364,7 @@ const food = {
             if (this.data.foodList.status && this.data.diningTableList.status) {
                 this.data.dom.food_ordered =
                     document.querySelector("#food_ordered");
-                this.data.dom.order_table_number = document.querySelector(
-                    "#order_table_number"
-                );
+                
                 this.data.foodList.data.forEach((f) => {
                     const option = document.createElement("option");
                     option.value = f.id;
@@ -374,12 +372,7 @@ const food = {
                         f.name + " (" + formatter.formatRupiah(f.price) + ")";
                     this.data.dom.food_ordered.appendChild(option);
                 });
-                this.data.diningTableList.data.forEach((t) => {
-                    const option = document.createElement("option");
-                    option.value = t.id;
-                    option.textContent = t.number;
-                    this.data.dom.order_table_number.appendChild(option);
-                });
+                
                 APP_LOADING.cancel(this.data.loading);
                 this.data.dom.inputs = document.querySelectorAll("input");
                 this.data.dom.inputs.forEach((input) => {
@@ -474,16 +467,45 @@ const food = {
                         }
                     }
                 });
-                const order_table_number = document.querySelector(
-                    "#order_table_number"
-                );
-                order_table_number.addEventListener("change", (e) => {
-                    e.target.classList.remove("is-invalid");
-                });
                 this.data.dom.addOrderForm =
                     document.querySelector("#addOrderForm");
                 this.data.dom.errorMessage =
                     document.querySelector("#errorMessage");
+
+                const type_order = document.getElementsByName('type_order');
+                const type_order_feedback = document.querySelector('#type_order_feedback');
+                const fieldTable = document.querySelector('#fieldTable');
+                type_order.forEach(t => {
+                    t.addEventListener('change', () => {
+                        type_order_feedback.classList.add('d-none');
+                        if(t.value === 'dine_in'){
+                            fieldTable.innerHTML = `<label for="order_table_number" class="col-sm-3 col-form-label">Dining Table Number</label>
+                            <div class="col-sm-9">
+                               <select class="form-control" id="order_table_number" name="order_table_number">
+                                    <option value="" selected>-- Choose Table Number --</option>
+                                </select>
+                                <div class="invalid-feedback" id="order_table_number_feedback"></div>
+                            </div>`;
+                            this.data.dom.order_table_number = document.querySelector(
+                                "#order_table_number"
+                            );
+                            this.data.diningTableList.data.forEach((t) => {
+                                const option = document.createElement("option");
+                                option.value = t.id;
+                                option.textContent = t.number;
+                                this.data.dom.order_table_number.appendChild(option);
+                            });
+                            this.data.dom.order_table_number.addEventListener("change", (e) => {
+                                e.target.classList.remove("is-invalid");
+                            });
+                        } else if(t.value === 'direct'){
+                            fieldTable.innerHTML = '';
+                        }
+                        else {
+                            document.location.href = location.href;
+                        }
+                    })
+                })
                 this.data.dom.addOrderForm.addEventListener(
                     "submit",
                     async (e) => {
@@ -493,6 +515,18 @@ const food = {
                             "order_food",
                             JSON.stringify(this.data.payload.order_food)
                         );
+                        
+                        let checked = false;
+                        type_order.forEach(t => {
+                            if(t.checked){
+                                checked = true;
+                            }
+                        });
+                        if(!checked){
+                            type_order_feedback.classList.remove('d-none');
+                            return;
+                        }
+                        
                         if (this.validate(orderFormData)) {
                             this.data.loading = APP_LOADING.activate();
                             const ordered = await this.store(orderFormData);
@@ -518,6 +552,7 @@ const food = {
                             } else {
                                 APP_LOADING.cancel(this.data.loading);
                                 TOAST_BODY.textContent = ordered.message;
+                                TOAST.classList.remove("bg-danger");
                                 TOAST.classList.add("bg-success");
                                 TOAST_APP.show();
                                 history.pushState("", "", "/admin/order");
@@ -875,6 +910,7 @@ const food = {
         },
         validate: function (formData) {
             for (let pair of formData.entries()) {
+                console.log(pair[0] + " : " + pair[1]);
                 if (pair[1].type && pair[1].size > 0) {
                     const elem = document.querySelector("#" + pair[0]);
                     const elemFeedBack = document.querySelector(

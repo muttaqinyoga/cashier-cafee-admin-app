@@ -100,10 +100,21 @@ class OrderController extends Controller
 
     public function save(Request $request)
     {
-        $validation = Validator::make($request->all(), [
-            'order_table_number' => 'required|exists:dining_tables,id',
-            'order_food' => 'required'
-        ]);
+        $validation = null;
+        if($request->has('order_table_number')){
+            $validation = Validator::make($request->all(), [
+                'order_table_number' => 'required|exists:dining_tables,id',
+                'order_customer_name' => 'required',
+                'order_food' => 'required'
+            ]);
+            
+        } else {
+            $validation = Validator::make($request->all(), [
+                'order_customer_name' => 'required',
+                'order_food' => 'required'
+            ]);
+        }
+        
         $response = new Response();
         if ($validation->fails()) {
             $response->setStatus(false);
@@ -132,14 +143,19 @@ class OrderController extends Controller
             $valid_foods = 0;
             $total_price = 0;
             $foods = Food::orderBy('created_at')->get();
-            $dinning_table = DiningTables::findOrFail($request->order_table_number);
+            $dinning_table = null;
             $order = new Order;
             $order->id = $id;
             $order->order_number = date('YmdHis');
+            $order->customer_name = $request->order_customer_name;
             $order->total_price = $total_price;
-            $order->table_id = $request->order_table_number;
+            if($request->has('order_table_number')){
+                $dinning_table = DiningTables::findOrFail($request->order_table_number);
+                $dinning_table->status = 'UNAVALIABLE';
+                $dinning_table->save();
+                $order->table_id = $request->order_table_number;
+            }
             $order->save();
-
             foreach ($foods as $f) {
                 foreach ($order_food as $of) {
                     if ($f->id == $of['food']) {
@@ -162,12 +178,10 @@ class OrderController extends Controller
                 $response->setStatus(false);
                 $response->setMessage("Invalid request data : Food not valid!");
                 $response->setHttpCode(400);
-                $response->setData([]);
+                $response->setData(null);
                 return $response->build();
             }
             $order->total_price = $total_price;
-            $dinning_table->status = 'UNAVALIABLE';
-            $dinning_table->save();
             $order->save();
             DB::commit();
             $response->setStatus(true);

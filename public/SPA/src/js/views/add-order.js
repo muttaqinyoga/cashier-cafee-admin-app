@@ -16,8 +16,8 @@ export default () =>
                         <form method="post" id="addOrderForm">
                             <input type="hidden" name="_token" value="${APP_STATE.csrf}" >
                             <div class="mb-3 row">
-                                <label for="order_food" class="col-sm-2 col-form-label">Menu</label>
-                                <div class="col-sm-10" id="order_food">
+                                <label for="order_food" class="col-sm-3 col-form-label">Menu</label>
+                                <div class="col-sm-9" id="order_food">
                                     
                                 </div>
                             </div>
@@ -25,11 +25,32 @@ export default () =>
                                 <button type="button" class="btn btn-primary" id="addMoreMenu" data-bs-toggle="modal" data-bs-target="#addFoodOrderModal">+</button>  
                             </div>
                             <div class="mb-3 row">
-                                <label for="order_table_number" class="col-form-label">Dining Table Number</label>
-                                <select class="form-control" id="order_table_number" name="order_table_number">
-                                        <option value="" selected>-- Choose Table Number --</option>
-                                </select>
-                                <div class="invalid-feedback" id="order_table_number_feedback"></div>
+                                <label class="col-sm-3 col-form-label">Type Order</label>
+                                <div class="col-sm-9">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="type_order" id="dineIn" value="dine_in">
+                                        <label class="form-check-label" for="dineIn">
+                                            Dine in
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="type_order" id="direct" value="direct">
+                                        <label class="form-check-label" for="direct">
+                                            Direct
+                                        </label>
+                                    </div>
+                                    <small class="text-danger d-none" id="type_order_feedback">Choose one of type orders</small>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="order_customer_name" class="col-sm-3 col-form-label">Customer Name</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="order_customer_name" id="order_customer_name">
+                                    <div class="invalid-feedback" id="order_customer_name_feedback"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3 row" id="fieldTable">
+                                
                             </div>
                             <div class="mb-3 row">
                                 <button type="submit" class="form-control btn btn-info">Create</button>
