@@ -64,6 +64,12 @@ export default () =>
                         </div>
                     </div>
                     <div class="mb-3 row">
+                        <label for="detail_order_customer" class="col-sm-3 col-form-label">Customer</label>
+                        <div class="col-sm-9">
+                            <input type="text" readonly class="form-control-plaintext" id="detail_order_customer">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
                         <label for="detail_table_number" class="col-sm-3 col-form-label">Table Number</label>
                         <div class="col-sm-9">
                             <input type="text" readonly class="form-control-plaintext" id="detail_table_number">
@@ -82,6 +88,13 @@ export default () =>
                         <div class="col-sm-9">
                             <input type="text" readonly class="form-control-plaintext" id="detail_total_price">
                             <small class="text-danger">* Total order could be different from current total foods ordered due to some food has been updated</small>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="order_notes" class="col-sm-3 col-form-label">Notes</label>
+                        <div class="col-sm-9">
+                            <textarea type="text" readonly class="form-control-plaintext" id="order_notes">
+                            </textarea>
                         </div>
                     </div>
                     <div class="mb-3 row">

@@ -49,6 +49,14 @@ export default () =>
                                     <div class="invalid-feedback" id="order_customer_name_feedback"></div>
                                 </div>
                             </div>
+                            <div class="mb-3 row">
+                                <label for="order_notes" class="col-sm-3 col-form-label">Notes</label>
+                                <div class="col-sm-9">
+                                    <textarea class="form-control" name="order_notes" id="order_notes" row="3" max="100">
+                                    </textarea>
+                                    <div class="invalid-feedback">Notes must be lower than 100 characters</div>
+                                </div>
+                            </div>
                             <div class="mb-3 row" id="fieldTable">
                                 
                             </div>

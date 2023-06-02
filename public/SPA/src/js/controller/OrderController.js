@@ -73,6 +73,7 @@ const food = {
             if (this.data.orderList.status) {
                 this.data.table.headings = [
                     "Order Number",
+                    "Customer",
                     "Table Number",
                     "Total Bills",
                     "Creation Date",
@@ -81,6 +82,7 @@ const food = {
                     "foods",
                     "payment",
                     "finished_at",
+                    "notes",
                 ];
                 this.data.table.data = [];
                 for (let i = 0; i < this.data.orderList.data.length; i++) {
@@ -89,8 +91,18 @@ const food = {
                         this.data.orderList.data[i]["order_number"]
                     );
                     this.data.table.data[i].push(
-                        this.data.orderList.data[i]["table"]["number"]
+                        this.data.orderList.data[i]["customer_name"]
                     );
+                    if (this.data.orderList.data[i]["table_id"]) {
+                        this.data.table.data[i].push(
+                            this.data.orderList.data[i]["table"]["number"]
+                        );
+                    } else {
+                        this.data.table.data[i].push(
+                            this.data.orderList.data[i]["table_id"]
+                        );
+                    }
+
                     this.data.table.data[i].push(
                         this.data.orderList.data[i]["total_price"]
                     );
@@ -111,6 +123,9 @@ const food = {
                     );
                     this.data.table.data[i].push(
                         this.data.orderList.data[i]["updated_at"]
+                    );
+                    this.data.table.data[i].push(
+                        this.data.orderList.data[i]["notes"]
                     );
                 }
                 this.initFoodTable(this.data.table);
@@ -189,21 +204,33 @@ const food = {
                     },
                     {
                         select: 2,
+                        sortable: true,
+                        render: function (data) {
+                            if (data) {
+                                return data;
+                            }
+                            return "Direct Order";
+                        },
+                    },
+                    {
+                        select: 3,
                         render: function (data) {
                             return formatter.formatRupiah(data);
                         },
                         sortable: true,
                     },
                     {
-                        select: 3,
+                        select: 4,
                         sortable: true,
                         render: function (data) {
                             const date = new Date(data);
-                            return date.toLocaleDateString();
+                            return `${date.getDate()}/${
+                                date.getMonth() + 1
+                            }/${date.getFullYear()} ${date.toLocaleTimeString()}`;
                         },
                     },
                     {
-                        select: 4,
+                        select: 5,
                         render: function (data) {
                             return data == "Proses"
                                 ? `<span class="badge rounded-pill bg-primary">${data}</span>`
@@ -212,10 +239,10 @@ const food = {
                         sortable: true,
                     },
                     {
-                        select: 5,
+                        select: 6,
                         sortable: false,
                         render: (data, cell, row) => {
-                            const status = row.childNodes[4].textContent;
+                            const status = row.childNodes[5].textContent;
                             if (status === "Selesai") {
                                 return `<button type="button" class="btn btn-info btn-sm detailOrder">Detail</button>`;
                             }
@@ -228,11 +255,6 @@ const food = {
                         },
                     },
                     {
-                        select: 6,
-                        sortable: false,
-                        hidden: true,
-                    },
-                    {
                         select: 7,
                         sortable: false,
                         hidden: true,
@@ -242,9 +264,19 @@ const food = {
                         sortable: false,
                         hidden: true,
                     },
+                    {
+                        select: 9,
+                        sortable: false,
+                        hidden: true,
+                    },
+                    {
+                        select: 10,
+                        sortable: false,
+                        hidden: true,
+                    },
                 ],
-                perPage: 4,
-                perPageSelect: [4, 10, 20, 50],
+                perPage: 10,
+                perPageSelect: [10, 20, 50],
             });
             FoodDataTables.on("datatable.init", function () {
                 const thead = document.querySelector("#foodTables > thead");
@@ -259,7 +291,7 @@ const food = {
                         "#ConfirmDeleteModal .modal-body"
                     );
                     modalBody.innerHTML = `Do you want to cancel <strong>${data[0]}</strong> Order ? This will delete it from Order List`;
-                    delete_id.value = data[5];
+                    delete_id.value = data[6];
                     this.data.dom.ConfirmDeleteModal.show();
                 } else if (e.target.classList.contains("detailOrder")) {
                     const idx = e.target.parentNode.parentNode.dataIndex;
@@ -268,31 +300,36 @@ const food = {
                     this.data.dom.detail_foods.innerHTML = "";
 
                     this.data.dom.detail_order_number.value = data[0];
-                    this.data.dom.detail_table_number.value = data[1];
+                    const detail_order_customer = document.querySelector(
+                        "#detail_order_customer"
+                    );
+                    detail_order_customer.value = data[1];
+                    this.data.dom.detail_table_number.value = data[2]
+                        ? data[2]
+                        : "Direct Order";
                     this.data.dom.detail_total_price.value =
-                        formatter.formatRupiah(data[2]);
-                    const date = new Date(data[3]);
-                    const created_at =
-                        date.toLocaleDateString() +
-                        " " +
-                        date.toLocaleTimeString();
+                        formatter.formatRupiah(data[3]);
+                    const date = new Date(data[4]);
+                    const created_at = `${date.getDate()}/${
+                        date.getMonth() + 1
+                    }/${date.getFullYear()} ${date.toLocaleTimeString()}`;
                     this.data.dom.detail_created_at.value = created_at;
                     const finished_at = document.querySelector("#finished_at");
-                    const dateFinishedAt = new Date(data[8]);
+                    const dateFinishedAt = new Date(data[9]);
                     if (
                         date.toLocaleTimeString() ==
-                        dateFinishedAt.toLocaleTimeString() || data[4] != "Selesai"
+                            dateFinishedAt.toLocaleTimeString() ||
+                        data[5] != "Selesai"
                     ) {
                         finished_at.value = "-";
                     } else {
-                        finished_at.value =
-                            date.toLocaleDateString() +
-                            " " +
-                            dateFinishedAt.toLocaleTimeString();
+                        finished_at.value = `${dateFinishedAt.getDate()}/${
+                            dateFinishedAt.getMonth() + 1
+                        }/${dateFinishedAt.getFullYear()} ${dateFinishedAt.toLocaleTimeString()}`;
                     }
 
-                    this.data.dom.detail_status.textContent = data[4];
-                    if (data[4] == "Selesai") {
+                    this.data.dom.detail_status.textContent = data[5];
+                    if (data[5] == "Selesai") {
                         this.data.dom.detail_status.classList.remove(
                             "bg-danger"
                         );
@@ -303,13 +340,15 @@ const food = {
                         );
                         this.data.dom.detail_status.classList.add("bg-primary");
                     }
-                    data[6].forEach((f) => {
+                    data[7].forEach((f) => {
                         const li = document.createElement("li");
                         li.textContent = `${f.name} (${formatter.formatRupiah(
                             f.price
                         )}) x ${f.pivot.quantity_ordered}pcs`;
                         this.data.dom.detail_foods.appendChild(li);
                     });
+                    const order_notes = document.querySelector("#order_notes");
+                    order_notes.value = data[10];
                     this.data.dom.detailOrderModal.show();
                 } else if (e.target.classList.contains("finishOrder")) {
                     const finishOrderModal = new bootstrap.Modal(
@@ -321,10 +360,11 @@ const food = {
                     const payment_order_id =
                         document.querySelector("#payment_order_id");
                     const idx = e.target.parentNode.parentNode.dataIndex;
+
                     const data = this.data.table.data[idx];
-                    payment_order_id.value = data[7];
+                    payment_order_id.value = data[8];
                     finishOrderModalBody.innerHTML = `Do you want to finish <strong>${data[0]}</strong> Order's ? This will create a payment for this order`;
-                    initPaid(data[2]);
+                    initPaid(data[3]);
                     finishOrderModal.show();
                     this.initSubmitPayment(
                         payment_order_id.value,
@@ -364,7 +404,7 @@ const food = {
             if (this.data.foodList.status && this.data.diningTableList.status) {
                 this.data.dom.food_ordered =
                     document.querySelector("#food_ordered");
-                
+
                 this.data.foodList.data.forEach((f) => {
                     const option = document.createElement("option");
                     option.value = f.id;
@@ -372,7 +412,7 @@ const food = {
                         f.name + " (" + formatter.formatRupiah(f.price) + ")";
                     this.data.dom.food_ordered.appendChild(option);
                 });
-                
+
                 APP_LOADING.cancel(this.data.loading);
                 this.data.dom.inputs = document.querySelectorAll("input");
                 this.data.dom.inputs.forEach((input) => {
@@ -472,13 +512,15 @@ const food = {
                 this.data.dom.errorMessage =
                     document.querySelector("#errorMessage");
 
-                const type_order = document.getElementsByName('type_order');
-                const type_order_feedback = document.querySelector('#type_order_feedback');
-                const fieldTable = document.querySelector('#fieldTable');
-                type_order.forEach(t => {
-                    t.addEventListener('change', () => {
-                        type_order_feedback.classList.add('d-none');
-                        if(t.value === 'dine_in'){
+                const type_order = document.getElementsByName("type_order");
+                const type_order_feedback = document.querySelector(
+                    "#type_order_feedback"
+                );
+                const fieldTable = document.querySelector("#fieldTable");
+                type_order.forEach((t) => {
+                    t.addEventListener("change", () => {
+                        type_order_feedback.classList.add("d-none");
+                        if (t.value === "dine_in") {
                             fieldTable.innerHTML = `<label for="order_table_number" class="col-sm-3 col-form-label">Dining Table Number</label>
                             <div class="col-sm-9">
                                <select class="form-control" id="order_table_number" name="order_table_number">
@@ -486,26 +528,39 @@ const food = {
                                 </select>
                                 <div class="invalid-feedback" id="order_table_number_feedback"></div>
                             </div>`;
-                            this.data.dom.order_table_number = document.querySelector(
-                                "#order_table_number"
-                            );
+                            this.data.dom.order_table_number =
+                                document.querySelector("#order_table_number");
                             this.data.diningTableList.data.forEach((t) => {
                                 const option = document.createElement("option");
                                 option.value = t.id;
                                 option.textContent = t.number;
-                                this.data.dom.order_table_number.appendChild(option);
+                                this.data.dom.order_table_number.appendChild(
+                                    option
+                                );
                             });
-                            this.data.dom.order_table_number.addEventListener("change", (e) => {
-                                e.target.classList.remove("is-invalid");
-                            });
-                        } else if(t.value === 'direct'){
-                            fieldTable.innerHTML = '';
-                        }
-                        else {
+                            this.data.dom.order_table_number.addEventListener(
+                                "change",
+                                (e) => {
+                                    e.target.classList.remove("is-invalid");
+                                }
+                            );
+                        } else if (t.value === "direct") {
+                            fieldTable.innerHTML = "";
+                        } else {
                             document.location.href = location.href;
                         }
-                    })
-                })
+                    });
+                });
+
+                const order_notes = document.querySelector("#order_notes");
+                order_notes.value = "";
+                order_notes.addEventListener("input", () => {
+                    if (order_notes.value.length > 100) {
+                        order_notes.classList.add("is-invalid");
+                        return;
+                    }
+                    order_notes.classList.remove("is-invalid");
+                });
                 this.data.dom.addOrderForm.addEventListener(
                     "submit",
                     async (e) => {
@@ -515,18 +570,22 @@ const food = {
                             "order_food",
                             JSON.stringify(this.data.payload.order_food)
                         );
-                        
+
                         let checked = false;
-                        type_order.forEach(t => {
-                            if(t.checked){
+                        type_order.forEach((t) => {
+                            if (t.checked) {
                                 checked = true;
                             }
                         });
-                        if(!checked){
-                            type_order_feedback.classList.remove('d-none');
+                        if (!checked) {
+                            type_order_feedback.classList.remove("d-none");
                             return;
                         }
-                        
+                        if (order_notes.value.length > 100) {
+                            order_notes.classList.add("is-invalid");
+                            return;
+                        }
+
                         if (this.validate(orderFormData)) {
                             this.data.loading = APP_LOADING.activate();
                             const ordered = await this.store(orderFormData);
@@ -582,9 +641,6 @@ const food = {
                 this.data.payload.table_number = order.data.table_number;
                 this.data.dom.food_ordered =
                     document.querySelector("#food_ordered");
-                this.data.dom.order_table_number = document.querySelector(
-                    "#order_table_number"
-                );
                 this.data.dom.order_food =
                     document.querySelector("#order_food");
                 const ul = document.createElement("ol");
@@ -638,17 +694,43 @@ const food = {
                         this.data.dom.food_ordered.appendChild(option);
                     }
                 });
-                const option = document.createElement("option");
-                option.value = order.data.table_id;
-                option.textContent = order.data.table.number;
-                option.selected = true;
-                this.data.dom.order_table_number.appendChild(option);
-                this.data.diningTableList.data.forEach((t) => {
+                const fieldTable = document.querySelector("#fieldTable");
+                if (order.data.table_id != null) {
+                    fieldTable.innerHTML = `<label for="order_table_number" class="col-sm-3 col-form-label">Dining Table Number</label>
+                            <div class="col-sm-9">
+                               <select class="form-control" id="order_table_number" name="order_table_number">
+                                </select>
+                                <div class="invalid-feedback" id="order_table_number_feedback"></div>
+                            </div>`;
+                    const order_table_number = document.querySelector(
+                        "#order_table_number"
+                    );
                     const option = document.createElement("option");
-                    option.value = t.id;
-                    option.textContent = t.number;
-                    this.data.dom.order_table_number.appendChild(option);
-                });
+                    option.value = order.data.table_id;
+                    option.textContent = order.data.table.number;
+                    option.selected = true;
+                    order_table_number.appendChild(option);
+                    this.data.diningTableList.data.forEach((t) => {
+                        const option = document.createElement("option");
+                        option.value = t.id;
+                        option.textContent = t.number;
+                        order_table_number.appendChild(option);
+                    });
+                    order_table_number.addEventListener("change", (e) => {
+                        e.target.classList.remove("is-invalid");
+                    });
+                    const dineIn = document.querySelector("#dineIn");
+                    dineIn.checked = true;
+                } else {
+                    const direct = document.querySelector("#direct");
+                    direct.checked = true;
+                }
+                const order_customer_name = document.querySelector(
+                    "#order_customer_name"
+                );
+                order_customer_name.value = order.data.customer_name;
+                const order_notes = document.querySelector("#order_notes");
+                order_notes.value = order.data.notes;
                 APP_LOADING.cancel(this.data.loading);
                 this.data.dom.inputs = document.querySelectorAll("input");
                 this.data.dom.inputs.forEach((input) => {
@@ -743,12 +825,55 @@ const food = {
                         }
                     }
                 });
-                this.data.dom.order_table_number.addEventListener(
-                    "change",
-                    (e) => {
-                        e.target.classList.remove("is-invalid");
-                    }
+
+                const type_order = document.getElementsByName("type_order");
+                const type_order_feedback = document.querySelector(
+                    "#type_order_feedback"
                 );
+                type_order.forEach((t) => {
+                    t.addEventListener("change", () => {
+                        type_order_feedback.classList.add("d-none");
+                        if (t.value === "dine_in") {
+                            fieldTable.innerHTML = `<label for="order_table_number" class="col-sm-3 col-form-label">Dining Table Number</label>
+                            <div class="col-sm-9">
+                               <select class="form-control" id="order_table_number" name="order_table_number">
+                                </select>
+                                <div class="invalid-feedback" id="order_table_number_feedback"></div>
+                            </div>`;
+                            const order_table_number = document.querySelector(
+                                "#order_table_number"
+                            );
+                            const option = document.createElement("option");
+                            option.value = order.data.table_id;
+                            option.textContent = order.data.table.number;
+                            option.selected = true;
+                            order_table_number.appendChild(option);
+                            this.data.diningTableList.data.forEach((t) => {
+                                const option = document.createElement("option");
+                                option.value = t.id;
+                                option.textContent = t.number;
+                                order_table_number.appendChild(option);
+                            });
+                            order_table_number.addEventListener(
+                                "change",
+                                (e) => {
+                                    e.target.classList.remove("is-invalid");
+                                }
+                            );
+                        } else if (t.value === "direct") {
+                            fieldTable.innerHTML = "";
+                        } else {
+                            document.location.href = location.href;
+                        }
+                    });
+                });
+                order_notes.addEventListener("input", () => {
+                    if (order_notes.value.length > 100) {
+                        order_notes.classList.add("is-invalid");
+                        return;
+                    }
+                    order_notes.classList.remove("is-invalid");
+                });
                 this.data.dom.addOrderForm =
                     document.querySelector("#addOrderForm");
                 this.data.dom.errorMessage =
@@ -757,6 +882,20 @@ const food = {
                     "submit",
                     async (e) => {
                         e.preventDefault();
+                        let checked = false;
+                        type_order.forEach((t) => {
+                            if (t.checked) {
+                                checked = true;
+                            }
+                        });
+                        if (!checked) {
+                            type_order_feedback.classList.remove("d-none");
+                            return;
+                        }
+                        if (order_notes.value.length > 100) {
+                            order_notes.classList.add("is-invalid");
+                            return;
+                        }
                         const orderFormData = new FormData(e.target);
                         orderFormData.append("order_id", this.data.payload.id);
                         orderFormData.append(
@@ -823,6 +962,7 @@ const food = {
                         TOAST.classList.add("bg-danger");
                         TOAST_BODY.textContent = finished.message;
                         TOAST_APP.show();
+                        routing.run("/admin/order");
                     } else {
                         APP_LOADING.cancel(this.data.loading);
                         TOAST_BODY.textContent = finished.message;
@@ -910,7 +1050,6 @@ const food = {
         },
         validate: function (formData) {
             for (let pair of formData.entries()) {
-                console.log(pair[0] + " : " + pair[1]);
                 if (pair[1].type && pair[1].size > 0) {
                     const elem = document.querySelector("#" + pair[0]);
                     const elemFeedBack = document.querySelector(
@@ -946,8 +1085,7 @@ const food = {
                 if (
                     !pair[1] &&
                     pair[1].name != "" &&
-                    pair[0] != "food_description" &&
-                    pair[0] != "edit_food_description"
+                    pair[0] != "order_notes"
                 ) {
                     const elem = document.querySelector("#" + pair[0]);
                     const elemFeedBack = document.querySelector(

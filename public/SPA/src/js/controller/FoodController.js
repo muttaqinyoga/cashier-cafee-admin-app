@@ -223,8 +223,8 @@ const food = {
                         hidden: true,
                     },
                 ],
-                perPage: 4,
-                perPageSelect: [4, 10, 20, 50],
+                perPage: 10,
+                perPageSelect: [10, 20, 50],
             });
             FoodDataTables.on("datatable.init", function () {
                 const thead = document.querySelector("#foodTables > thead");

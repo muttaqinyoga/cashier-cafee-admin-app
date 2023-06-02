@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderDetails;
 use Illuminate\Http\Request;
 use App\Models\Response;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Crypt;
@@ -35,7 +36,7 @@ class OrderController extends Controller
     {
         $response = new Response();
         try {
-            $orders = Order::with(["table", "foods"])->get();
+            $orders = Order::with(["table", "foods"])->orderBy('order_number', 'desc')->get();
             $response->setStatus(true);
             $response->setMessage("success");
             $order_map = $this->encryptOrder($orders);
@@ -101,20 +102,19 @@ class OrderController extends Controller
     public function save(Request $request)
     {
         $validation = null;
-        if($request->has('order_table_number')){
+        if ($request->has('order_table_number')) {
             $validation = Validator::make($request->all(), [
                 'order_table_number' => 'required|exists:dining_tables,id',
                 'order_customer_name' => 'required',
                 'order_food' => 'required'
             ]);
-            
         } else {
             $validation = Validator::make($request->all(), [
                 'order_customer_name' => 'required',
                 'order_food' => 'required'
             ]);
         }
-        
+
         $response = new Response();
         if ($validation->fails()) {
             $response->setStatus(false);
@@ -149,11 +149,14 @@ class OrderController extends Controller
             $order->order_number = date('YmdHis');
             $order->customer_name = $request->order_customer_name;
             $order->total_price = $total_price;
-            if($request->has('order_table_number')){
+            $order->notes = $request->order_notes;
+            if ($request->has('order_table_number')) {
                 $dinning_table = DiningTables::findOrFail($request->order_table_number);
                 $dinning_table->status = 'UNAVALIABLE';
                 $dinning_table->save();
                 $order->table_id = $request->order_table_number;
+            } else {
+                $order->status = 'Selesai';
             }
             $order->save();
             foreach ($foods as $f) {
@@ -232,11 +235,20 @@ class OrderController extends Controller
 
     public function update(Request $request)
     {
-        $validation = Validator::make($request->all(), [
-            'order_table_number' => 'required|exists:dining_tables,id',
-            'order_food' => 'required'
-        ]);
         $response = new Response();
+        $validation = null;
+        if ($request->has('order_table_number')) {
+            $validation = Validator::make($request->all(), [
+                'order_table_number' => 'required|exists:dining_tables,id',
+                'order_customer_name' => 'required',
+                'order_food' => 'required'
+            ]);
+        } else {
+            $validation = Validator::make($request->all(), [
+                'order_customer_name' => 'required',
+                'order_food' => 'required'
+            ]);
+        }
         if ($validation->fails()) {
             $response->setStatus(false);
             $response->setMessage("Unprocessable Entity");
@@ -248,7 +260,7 @@ class OrderController extends Controller
         }
         $order = null;
         try {
-            $order = Order::with(['foods'])->where('id', '=', $request->order_id)->firstOrFail();
+            $order = Order::with(['foods'])->where('id', '=', $request->order_id, 'and')->where('status', '!=', 'Selesai')->firstOrFail();
         } catch (ModelNotFoundException $m) {
             $response->setStatus(false);
             $response->setMessage('Requested data could not be found');
@@ -283,9 +295,23 @@ class OrderController extends Controller
             $valid_foods = 0;
             $total_price = 0;
             $foods = Food::orderBy('created_at')->get();
-            $curr_dinning_table = DiningTables::findOrFail($order->table_id);
-            $curr_dinning_table->status = 'AVALIABLE';
-            $curr_dinning_table->update();
+            if (!is_null($order->table_id)) {
+                $curr_dinning_table = DiningTables::findOrFail($order->table_id);
+                $curr_dinning_table->status = 'AVALIABLE';
+                $curr_dinning_table->update();
+            }
+            if ($request->has('order_table_number')) {
+                $order->table_id = $request->order_table_number;
+                $dinning_table = DiningTables::findOrFail($request->order_table_number);
+                $dinning_table->status = 'UNAVALIABLE';
+                $dinning_table->update();
+            } else {
+                $order->table_id = null;
+                $order->status = 'Selesai';
+                $order->created_at = Carbon::now();
+                $order->updated_at = Carbon::now();
+            }
+
             $order->foods()->detach();
             foreach ($foods as $f) {
                 foreach ($order_food as $of) {
@@ -313,10 +339,7 @@ class OrderController extends Controller
                 return $response->build();
             }
             $order->total_price = $total_price;
-            $order->table_id = $request->order_table_number;
-            $dinning_table = DiningTables::findOrFail($request->order_table_number);
-            $dinning_table->status = 'UNAVALIABLE';
-            $dinning_table->update();
+            $order->notes = $request->order_notes;
             $order->update();
             DB::commit();
             $response->setStatus(true);
@@ -341,7 +364,7 @@ class OrderController extends Controller
         $response = new Response();
         DB::beginTransaction();
         try {
-            $order = Order::findOrFail($request->delete_id);
+            $order = Order::where('id', '=', $request->delete_id, 'and')->where('status', '!=', 'Selesai')->firstOrFail();
             $order->foods()->detach();
             $dinning_table = DiningTables::findOrFail($order->table_id);
             $dinning_table->status = 'AVALIABLE';
@@ -379,11 +402,15 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
             $order = Order::findOrFail($paymentCode);
-            $table = DiningTables::findOrFail($order->table_id);
+
+            if (!is_null($order->table_id)) {
+                $table = DiningTables::findOrFail($order->table_id);
+                $table->status = 'AVALIABLE';
+                $table->update();
+            }
             $order->status = 'Selesai';
-            $table->status = 'AVALIABLE';
             $order->update();
-            $table->update();
+
             DB::commit();
             $response->setStatus(true);
             $response->setMessage("$order->order_number has been finished");
