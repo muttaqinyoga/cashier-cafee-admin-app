@@ -32,6 +32,9 @@
                         <a class="nav-link food" href="/admin/food" data-link>Food List</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link food" href="/admin/dinningtables" data-link>Dinning Tables</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link order" href="/admin/order" data-link>Orders</a>
                     </li>
                 </ul>

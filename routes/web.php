@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DinningTableController;
 use App\Http\Controllers\FoodController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
@@ -38,6 +39,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/api/admin/foods/{id}/get', [FoodController::class, 'getFoodById']);
     Route::post('/api/admin/foods/update', [FoodController::class, 'update']);
     Route::delete('/api/admin/foods/delete', [FoodController::class, 'delete']);
+    Route::get('/api/admin/dinningtables/get', [DinningTableController::class, 'getAllTables']);
     Route::get('/api/admin/orders/get', [OrderController::class, 'getListOrder']);
     Route::get('/api/admin/orders', [OrderController::class, 'getListFood']);
     Route::get('/api/admin/tables/get', [OrderController::class, 'getDiningTables']);

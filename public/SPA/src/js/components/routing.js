@@ -1,6 +1,7 @@
 import home from "../views/home.js";
 import category from "../controller/CategoryController.js";
 import food from "../controller/FoodController.js";
+import dinningtable from "../controller/DinningTableController.js";
 import order from "../controller/OrderController.js";
 const app = document.querySelector("#app");
 const routing = {
@@ -38,6 +39,13 @@ const routing = {
             render: food.view("edit"),
             controller: function (params) {
                 return food.init("edit", params);
+            },
+        },
+        "/admin/dinningtables": {
+            title: "Aplikasi Kasir Kafe - Dinning Table",
+            render: dinningtable.view("index"),
+            controller: function () {
+                return dinningtable.init("index");
             },
         },
         "/admin/order": {
