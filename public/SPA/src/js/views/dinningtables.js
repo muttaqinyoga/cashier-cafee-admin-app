@@ -53,37 +53,38 @@ export default () =>
             </div>
         </div>
     </div>
-    <div class="modal fade text-left" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModal" role="dialog">
+    <div class="modal fade text-left" id="editDinningTableModal" tabindex="-1" aria-labelledby="editDinningTableModal" role="dialog">
         <div class="modal-dialog modal-dialog-top modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-warning">
-                    <h4 class="modal-title text-light">Edit Food Category</h4>
+                    <h4 class="modal-title text-light">Edit Dinning Table</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
 
                     </button>
                 </div>
-                <form method="post" id="editCategoryForm">
+                <form method="post" id="editDinningTableForm">
                     <input type="hidden" name="_token" value="${APP_STATE.csrf}" >
-                    <input type="hidden" name="category_edit_id" id="category_edit_id">
+                    <input type="hidden" name="dinning_table_edit_id" id="dinning_table_edit_id">
                     <div class="modal-body">
-                        <label>Name</label>
+                        <label for="dinning_table_edit_number">Name</label>
                         <div class="form-group">
-                            <input type="text" placeholder="Enter category food name..." class="form-control" name="category_edit_name" id="category_edit_name">
-                            <div class="invalid-feedback" id="category_edit_name_feedback">
+                            <input type="number" class="form-control" name="dinning_table_edit_number" id="dinning_table_edit_number">
+                            <div class="invalid-feedback" id="dinning_table_edit_number_feedback">
                             
                             </div>
                         </div>
-                        <label>Image</label>
-                        <div class="form-group mb-2">
-                            <img src="" class="img-fluid d-block" alt="food-categories" width="100" id="current_category_edit_image">
-                        </div>
+                        <label>Status</label>
                         <div class="form-group">
-                            <input class="form-control" type="file" name="category_edit_image" id="category_edit_image">
-                            <div class="invalid-feedback" id="category_edit_image_feedback">
-
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="edit_food_status" id="dinning_table_status_1" value="AVALIABLE">
+                                <label class="form-check-label" for="dinning_table_status_1">AVALIABLE</label>
                             </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="edit_food_status" id="dinning_table_status_2" value="UNAVALIABLE">
+                                <label class="form-check-label" for="dinning_table_status_2">UNAVALIABLE</label>
+                            </div>
+                            <small class="text-danger d-none" id="edit_food_status_feedback">Choose one of status</small>
                         </div>
-                        <small class="text-info">* Let it blank if image would not change</small>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">

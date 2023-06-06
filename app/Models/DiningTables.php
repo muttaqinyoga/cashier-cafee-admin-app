@@ -12,6 +12,6 @@ class DiningTables extends Model
 
     public function order()
     {
-        return $this->hasMany("App\Models\Order", "id");
+        return $this->hasMany("App\Models\Order", 'table_id');
     }
 }

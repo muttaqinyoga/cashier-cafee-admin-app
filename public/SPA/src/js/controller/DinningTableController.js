@@ -69,7 +69,7 @@ const dinningtable = {
                     });
                 });
 
-                /*   ADD CATEGORY  */
+                /*   ADD Dinning Table  */
                 const addDinningTableModal = new bootstrap.Modal(
                     "#addDinningTableModal"
                 );
@@ -92,7 +92,6 @@ const dinningtable = {
                     e.preventDefault();
                     const addFormData = new FormData(addDinningTableForm);
                     if (this.validate(addFormData)) {
-                        return;
                         TOAST.classList.remove("bg-primary");
                         TOAST.classList.remove("bg-danger");
                         this.data.loading = APP_LOADING.activate();
@@ -120,93 +119,109 @@ const dinningtable = {
                             TOAST_BODY.textContent = saved.message;
                             TOAST.classList.add("bg-primary");
                             TOAST_APP.show();
-                            routing.run("/admin/category");
+                            routing.run("/admin/dinningtables");
                         }
                     }
                 });
-                /*   END ADD CATEGORY  */
+                /*   END ADD Dinning Table  */
 
-                /*   DELETE CATEGORY  */
-                // this.data.dom.ConfirmDeleteModal = new bootstrap.Modal(
-                //     "#ConfirmDeleteModal"
-                // );
-                // this.data.dom.deleteConfirmForm =
-                //     document.querySelector("#deleteConfirmForm");
-                // this.data.dom.deleteConfirmForm.addEventListener(
-                //     "submit",
-                //     async (e) => {
-                //         e.preventDefault();
-                //         TOAST.classList.remove("bg-primary");
-                //         TOAST.classList.remove("bg-danger");
-                //         this.data.dom.ConfirmDeleteModal.hide();
-                //         this.data.loading = APP_LOADING.activate();
-                //         const deleteCategoryForm = new FormData(e.target);
-                //         const deleted = await this.delete(deleteCategoryForm);
-                //         if (!deleted.status) {
-                //             APP_LOADING.cancel(this.data.loading);
-                //             TOAST.classList.add("bg-danger");
-                //             TOAST_BODY.textContent = deleted.message;
-                //             TOAST_APP.show();
-                //         } else {
-                //             APP_LOADING.cancel(this.data.loading);
-                //             TOAST_BODY.textContent = deleted.message;
-                //             TOAST.classList.add("bg-primary");
-                //             TOAST_APP.show();
-                //             routing.run("/admin/category");
-                //         }
-                //     }
-                // );
-                /*   END DELETE CATEGORY  */
+                /*   DELETE DINNING TABLE  */
+                const ConfirmDeleteModal = new bootstrap.Modal(
+                    "#ConfirmDeleteModal"
+                );
+                const deleteConfirmForm =
+                    document.querySelector("#deleteConfirmForm");
+                deleteConfirmForm.addEventListener(
+                    "submit",
+                    async (e) => {
+                        e.preventDefault();
+                        TOAST.classList.remove("bg-primary");
+                        TOAST.classList.remove("bg-danger");
+                        ConfirmDeleteModal.hide();
+                        this.data.loading = APP_LOADING.activate();
+                        const deleteDinningTableForm = new FormData(e.target);
+                        const deleted = await this.delete(deleteDinningTableForm);
+                        if (!deleted.status) {
+                            APP_LOADING.cancel(this.data.loading);
+                            TOAST.classList.add("bg-danger");
+                            TOAST_BODY.textContent = deleted.message;
+                            TOAST_APP.show();
+                        } else {
+                            APP_LOADING.cancel(this.data.loading);
+                            TOAST_BODY.textContent = deleted.message;
+                            TOAST.classList.add("bg-primary");
+                            TOAST_APP.show();
+                            routing.run("/admin/dinningtables");
+                        }
+                    }
+                );
+                /*   END DELETE DINNING TABLE  */
 
-                /*   EDIT CATEGORY  */
-                // this.data.dom.editCategoryModal = new bootstrap.Modal(
-                //     "#editCategoryModal"
-                // );
-                // this.data.dom.editCategoryForm =
-                //     document.querySelector("#editCategoryForm");
+                /*   EDIT DINNING TABLE  */
+                const editDinningTableModal = new bootstrap.Modal(
+                    "#editDinningTableModal"
+                );
+                const editDinningTableForm =
+                    document.querySelector("#editDinningTableForm");
 
-                // this.data.dom.editCategoryForm.addEventListener(
-                //     "submit",
-                //     async (e) => {
-                //         e.preventDefault();
-                //         const editFormData = new FormData(
-                //             this.data.dom.editCategoryForm
-                //         );
-                //         if (this.validate(editFormData)) {
-                //             TOAST.classList.remove("bg-primary");
-                //             TOAST.classList.remove("bg-danger");
-                //             this.data.loading = APP_LOADING.activate();
-                //             this.data.dom.editCategoryModal.hide();
+                editDinningTableForm.addEventListener(
+                    "submit",
+                    async (e) => {
+                        e.preventDefault();
+                        const editFormData = new FormData(
+                            editDinningTableForm
+                        );
+                        const edit_food_status = document.getElementsByName(
+                            "edit_food_status"
+                        );
+                        const edit_food_status_feedback = document.querySelector('#edit_food_status_feedback');
+                        let hasChecked = false;
+                        edit_food_status.forEach(s => {
+                            s.addEventListener('change', () => {
+                                edit_food_status_feedback.classList.add('d-none');
+                            })
+                            if(s.checked){
+                                hasChecked = true;
+                            }
+                        });
+                        if(!hasChecked){
+                            edit_food_status_feedback.classList.remove('d-none');
+                        }
+                        if (this.validate(editFormData)) {
+                            TOAST.classList.remove("bg-primary");
+                            TOAST.classList.remove("bg-danger");
+                            this.data.loading = APP_LOADING.activate();
+                            editDinningTableModal.hide();
 
-                //             const updated = await this.update(editFormData);
-                //             if (!updated.status) {
-                //                 APP_LOADING.cancel(this.data.loading);
-                //                 TOAST.classList.add("bg-danger");
-                //                 const res = updated.data;
-                //                 if (res) {
-                //                     TOAST_BODY.innerHTML = "";
-                //                     const ul = document.createElement("ul");
-                //                     Object.keys(res.errors).forEach((key) => {
-                //                         const li = document.createElement("li");
-                //                         li.textContent = res.errors[key][0];
-                //                         ul.appendChild(li);
-                //                     });
-                //                     TOAST_BODY.appendChild(ul);
-                //                 } else {
-                //                     TOAST_BODY.textContent = updated.message;
-                //                 }
-                //                 TOAST_APP.show();
-                //             } else {
-                //                 APP_LOADING.cancel(this.data.loading);
-                //                 TOAST_BODY.textContent = updated.message;
-                //                 TOAST.classList.add("bg-primary");
-                //                 TOAST_APP.show();
-                //                 routing.run("/admin/category");
-                //             }
-                //         }
-                //     }
-                // );
-                /*  END EDIT CATEGORY  */
+                            const updated = await this.update(editFormData);
+                            if (!updated.status) {
+                                APP_LOADING.cancel(this.data.loading);
+                                TOAST.classList.add("bg-danger");
+                                const res = updated.data;
+                                if (res) {
+                                    TOAST_BODY.innerHTML = "";
+                                    const ul = document.createElement("ul");
+                                    Object.keys(res.errors).forEach((key) => {
+                                        const li = document.createElement("li");
+                                        li.textContent = res.errors[key][0];
+                                        ul.appendChild(li);
+                                    });
+                                    TOAST_BODY.appendChild(ul);
+                                } else {
+                                    TOAST_BODY.textContent = updated.message;
+                                }
+                                TOAST_APP.show();
+                            } else {
+                                APP_LOADING.cancel(this.data.loading);
+                                TOAST_BODY.textContent = updated.message;
+                                TOAST.classList.add("bg-primary");
+                                TOAST_APP.show();
+                                routing.run("/admin/dinningtables");
+                            }
+                        }
+                    }
+                );
+                /*  END EDIT DINNING TABLE  */
             } else {
                 APP_LOADING.cancel(this.data.loading);
                 TOAST_BODY.textContent = this.dinningtableList.message;
@@ -254,8 +269,8 @@ const dinningtable = {
                         sortable: false,
                         render: function () {
                             return `
-                                <button type="button" class="btn btn-warning btn-sm editDinningTable" >Edit</button>
-                                <button type="button"  class="btn btn-danger btn-sm deleteDinningTable" >Delete</button>
+                                <button type="button" class="btn btn-warning btn-sm editDinningTable" data-bs-toggle="modal" data-bs-target="#editDinningTableModal">Edit</button>
+                                <button type="button"  class="btn btn-danger btn-sm deleteDinningTable" data-bs-toggle="modal" data-bs-target="#ConfirmDeleteModal"  >Delete</button>
                                 `;
                         },
                     },
@@ -267,40 +282,41 @@ const dinningtable = {
                 const thead = document.querySelector("#foodTables > thead");
                 thead.classList.add("table-dark");
             });
-            // foodTables.addEventListener("click", (e) => {
-            //     if (e.target.classList.contains("editCategory")) {
-            //         this.data.dom.inputs.forEach((i) => {
-            //             i.classList.remove("is-invalid");
-            //         });
-            //         const idx = e.target.parentNode.parentNode.dataIndex;
-            //         const data = this.data.table.data[idx];
-            //         const category_edit_id =
-            //             document.querySelector("#category_edit_id");
-            //         const category_edit_name = document.querySelector(
-            //             "#category_edit_name"
-            //         );
-            //         const current_category_edit_image = document.querySelector(
-            //             "#current_category_edit_image"
-            //         );
-            //         category_edit_id.value = data[0];
-            //         category_edit_name.value = data[2];
-            //         current_category_edit_image.setAttribute(
-            //             "src",
-            //             APP_STATE.assetUrl + "images/dinningtables/" + data[3]
-            //         );
-            //         this.data.dom.editCategoryModal.show();
-            //     } else if (e.target.classList.contains("deleteCategory")) {
-            //         const idx = e.target.parentNode.parentNode.dataIndex;
-            //         const data = this.data.table.data[idx];
-            //         const delete_id = document.querySelector("#delete_id");
-            //         const modalBody = document.querySelector(
-            //             "#ConfirmDeleteModal .modal-body"
-            //         );
-            //         modalBody.innerHTML = `Do you want to remove <strong>${data[2]}</strong> from Category List ?`;
-            //         delete_id.value = data[0];
-            //         this.data.dom.ConfirmDeleteModal.show();
-            //     }
-            // });
+            foodTables.addEventListener("click", (e) => {
+                if (e.target.classList.contains("editDinningTable")) {
+                    const inputs = document.querySelectorAll('input');
+                    inputs.forEach((i) => {
+                        i.classList.remove("is-invalid");
+                    });
+                    const idx = e.target.parentNode.parentNode.dataIndex;
+                    const data = this.data.table.data[idx];
+                    const dinning_table_edit_id =
+                        document.querySelector("#dinning_table_edit_id");
+                    const dinning_table_edit_number = document.querySelector(
+                        "#dinning_table_edit_number"
+                    );
+                    const edit_food_status = document.getElementsByName(
+                        "edit_food_status"
+                    );
+                    dinning_table_edit_id.value = data[0];
+                    dinning_table_edit_number.value = data[1];
+                    edit_food_status.forEach(s => {
+                        if(s.value === data[2]){
+                            s.checked = true;
+                            return;
+                        }
+                    });
+                } else if (e.target.classList.contains("deleteDinningTable")) {
+                    const idx = e.target.parentNode.parentNode.dataIndex;
+                    const data = this.data.table.data[idx];
+                    const delete_id = document.querySelector("#delete_id");
+                    const modalBody = document.querySelector(
+                        "#ConfirmDeleteModal .modal-body"
+                    );
+                    modalBody.innerHTML = `Do you want to remove Dinning Table <strong>#${data[1]}</strong> from Dinning Table List ?`;
+                    delete_id.value = data[0];
+                }
+            });
         },
         validate: function (formData) {
             for (let pair of formData.entries()) {
@@ -323,7 +339,6 @@ const dinningtable = {
                         return false;
                     }
                 }
-                console.log(pair[1]);
                 if (!pair[1] && pair[1].name != "") {
                     const elem = document.querySelector("#" + pair[0]);
                     const elemFeedBack = document.querySelector(

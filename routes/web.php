@@ -40,6 +40,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/api/admin/foods/update', [FoodController::class, 'update']);
     Route::delete('/api/admin/foods/delete', [FoodController::class, 'delete']);
     Route::get('/api/admin/dinningtables/get', [DinningTableController::class, 'getAllTables']);
+    Route::post('/api/admin/dinningtables/save', [DinningTableController::class, 'save']);
+    Route::post('/api/admin/dinningtables/update', [DinningTableController::class, 'update']);
+    Route::delete('/api/admin/dinningtables/delete', [DinningTableController::class, 'delete']);
     Route::get('/api/admin/orders/get', [OrderController::class, 'getListOrder']);
     Route::get('/api/admin/orders', [OrderController::class, 'getListFood']);
     Route::get('/api/admin/tables/get', [OrderController::class, 'getDiningTables']);
