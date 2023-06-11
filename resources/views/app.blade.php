@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Aplikasi Kasir Kafe</title>
     <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
@@ -83,6 +83,7 @@
     </script>
     <script src="{{ asset('js/loadingOverlay.js') }}"></script>
     <script src="{{ asset('js/bootstrap.js') }}"></script>
+    <script src="{{ asset('js/qrcode.js') }}"></script>
     <script>
         const TOAST = document.querySelector("#toastApp");
         const TOAST_BODY = document.querySelector(
