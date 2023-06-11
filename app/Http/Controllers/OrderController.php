@@ -151,7 +151,7 @@ class OrderController extends Controller
             $order->total_price = $total_price;
             $order->notes = $request->order_notes;
             if ($request->has('order_table_number')) {
-                $dinning_table = DiningTables::findOrFail($request->order_table_number);
+                $dinning_table = DiningTables::where('id', '=', $request->order_table_number, 'and')->where('status', '!=', 'UNAVALIABLE')->firstOrFail();
                 $dinning_table->status = 'UNAVALIABLE';
                 $dinning_table->save();
                 $order->table_id = $request->order_table_number;
@@ -302,7 +302,7 @@ class OrderController extends Controller
             }
             if ($request->has('order_table_number')) {
                 $order->table_id = $request->order_table_number;
-                $dinning_table = DiningTables::findOrFail($request->order_table_number);
+                $dinning_table = DiningTables::where('id', '=', $request->order_table_number, 'and')->where('status', '!=', 'UNAVALIABLE')->firstOrFail();
                 $dinning_table->status = 'UNAVALIABLE';
                 $dinning_table->update();
             } else {
