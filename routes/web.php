@@ -51,5 +51,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/api/admin/orders/update', [OrderController::class, 'update']);
     Route::delete('/api/admin/orders/delete', [OrderController::class, 'delete']);
     Route::post('/api/admin/orders/finish', [OrderController::class, 'finish']);
+
+    Route::get('/api/admin/order/paymentmonthly', [OrderController::class, 'getMonthlyPayment']);
+    Route::get('/api/admin/order/paymentdaily', [OrderController::class, 'getDailyPayment']);
 });
+
+Route::get('/customer/order/{table}', [OrderController::class, 'customer']);
+Route::get('/api/menus/get', [OrderController::class, 'getListFood']);
 // Route::get('{path}', HomeController::class)->where('path', '(.*)');

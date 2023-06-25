@@ -3,14 +3,51 @@ import category from "../controller/CategoryController.js";
 import food from "../controller/FoodController.js";
 import dinningtable from "../controller/DinningTableController.js";
 import order from "../controller/OrderController.js";
+import formatter from "./utility/formatter.js";
 const app = document.querySelector("#app");
 const routing = {
     pages: {
         "/admin": {
             title: "Aplikasi Kasir Kafe",
             render: home,
-            controller: () => {
-                return null;
+            controller: async () => {
+                const loading = APP_LOADING.activate();
+                const dayPendapatan = document.querySelector("#dayPendapatan");
+                const dailyPayment = await fetch(
+                    `${APP_STATE.baseUrl}/api/admin/order/paymentdaily`
+                )
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((res) => {
+                        return res;
+                    });
+                if (dailyPayment && dailyPayment.data.dailypayment) {
+                    dayPendapatan.textContent = formatter.formatRupiah(
+                        dailyPayment.data.dailypayment
+                    );
+                } else {
+                    dayPendapatan.textContent = "Data masih nol";
+                }
+                const monthPendapatan =
+                    document.querySelector("#monthPendapatan");
+                const total = await fetch(
+                    `${APP_STATE.baseUrl}/api/admin/order/paymentmonthly`
+                )
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((res) => {
+                        return res;
+                    });
+                if (total) {
+                    monthPendapatan.textContent = formatter.formatRupiah(
+                        total.data.monthlypayment
+                    );
+                } else {
+                    monthPendapatan.textContent = "Gagal memuat data";
+                }
+                APP_LOADING.cancel(loading);
             },
         },
         "/admin/category": {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\DiningTables;
 use App\Models\Food;
 use App\Models\Order;
@@ -12,8 +13,10 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Date;
 use Validator;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\TryCatch;
 use Throwable;
 
 class OrderController extends Controller
@@ -58,6 +61,24 @@ class OrderController extends Controller
     {
         $response = new Response();
         if ($request->has("list") && $request->get("list") == "food") {
+            if ($request->has('with') && $request->get('with') == 'categories') {
+                try {
+                    $foods = Food::with(['categories'])->where("status_stock", "=", "Tersedia")->get();
+                    $response->setStatus(true);
+                    $response->setMessage("success");
+                    $response->setData($foods);
+                    $response->setHttpCode(200);
+                    return $response->build();
+                } catch (Throwable $th) {
+                    $response->setStatus(false);
+                    $response->setMessage("Something Went Wrong in the Server");
+                    $response->setHttpCode(500);
+                    $response->setData([
+                        "Details" => $th->getMessage()
+                    ]);
+                    return $response->build();
+                }
+            }
             try {
                 $foods = Food::where("status_stock", "=", "Tersedia")->get();
                 $response->setStatus(true);
@@ -433,6 +454,63 @@ class OrderController extends Controller
                 "Details" => $e->getMessage()
             ]);
             return $response->build();
+        }
+    }
+
+    public function getMonthlyPayment()
+    {
+        $response = new Response();
+        try {
+            $currMonth  = date('m');
+            $paymonth = DB::table('orders')->select(DB::raw('SUM(total_price) as monthlyPayment'))->whereMonth('created_at', '=', $currMonth)->first();
+            $response->setStatus(true);
+            $response->setMessage('success');
+            $response->setData($paymonth);
+            $response->setHttpCode(200);
+            return $response->build();
+        } catch (Throwable $e) {
+            $response->setStatus(false);
+            $response->setMessage("Something Went Wrong in the Server");
+            $response->setHttpCode(500);
+            $response->setData([
+                "Details" => $e->getMessage()
+            ]);
+            return $response->build();
+        }
+    }
+
+    public function getDailyPayment()
+    {
+        $response = new Response();
+        try {
+            $currDay  = date('Y-m-d');
+            $paymentToday = DB::table('orders')->select(DB::raw('SUM(total_price) as dailyPayment'))->whereDate('created_at', '=', $currDay)->first();
+            $response->setStatus(true);
+            $response->setMessage('success');
+            $response->setData($paymentToday);
+            $response->setHttpCode(200);
+            return $response->build();
+        } catch (Throwable $e) {
+            $response->setStatus(false);
+            $response->setMessage("Something Went Wrong in the Server");
+            $response->setHttpCode(500);
+            $response->setData([
+                "Details" => $e->getMessage()
+            ]);
+            return $response->build();
+        }
+    }
+
+    public function customer($table)
+    {
+        try {
+            $checkTable = DiningTables::where('id', '=', $table, 'and')->where('status', '=', 'AVALIABLE')->get()->count();
+            if ($checkTable > 0) {
+                $categories = DB::table('categories')->select('id', 'name')->get();
+                return view('customer', compact('categories'));
+            }
+        } catch (Throwable $th) {
+            return view('errors.500');
         }
     }
 }

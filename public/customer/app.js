@@ -54,7 +54,12 @@
             menus: null,
         },
         getMenu: function () {
-            return fetch("food_example.json")
+            return fetch(
+                `${APP_STATE.baseUrl}/api/menus/get?${new URLSearchParams({
+                    list: "food",
+                    with: "categories",
+                })}`
+            )
                 .then((response) => {
                     return response.json();
                 })
@@ -62,7 +67,10 @@
                     return res;
                 })
                 .catch((err) => {
-                    alert("Gagal memuat menu");
+                    TOAST.classList.remove("bg-success");
+                    TOAST.classList.add("bg-danger");
+                    TOAST_BODY.textContent = "Gagal memuat menu";
+                    TOAST_APP.show();
                 });
         },
         showMenu: function (menus) {
@@ -74,16 +82,19 @@
                 const matchedOrder = this.data.orders.find(
                     (o) => o.food === m.id
                 );
-                div.innerHTML = `<div class="card shadow-sm">
+                div.innerHTML = `<div class="card  bg-dark shadow" style="border: 1px solid #6c6c6c !important; box-shadow: 0 0.1rem 0.1rem #666 !important;">
                                         <img
-                                            src="${m.img}"
+                                            src="${
+                                                APP_STATE.assetUrl
+                                            }images/foods/${m.image}"
                                             class="card-img-top"
                                             height="150px"
                                         />
+                                        
                                         <div class="card-body">
-                                            <h5 class="card-title">
+                                            <h6 class="card-title text-light">
                                                 ${m.name}
-                                            </h5>
+                                            </h6>
                                             <span
                                                 class="badge text-bg-success card-subtitle"
                                                 data-value="${m.id}"
@@ -108,7 +119,7 @@
                                                     >-</span
                                                 >
                                                 <span
-                                                    class="badge rounded-pill text-bg-dark"
+                                                    class="badge rounded-pill text-bg-info"
                                                 >${
                                                     matchedOrder
                                                         ? matchedOrder.quantity
@@ -192,7 +203,7 @@
             ul.className = "list-group";
             cartComponent.addEventListener("click", () => {
                 if (this.data.orders.length === 0) {
-                    cart.innerHTML = `<div class="alert alert-dismissible alert-danger">Anda belum memilih menu</div>`;
+                    cart.innerHTML = `<div class="alert alert-dismissible alert-danger text-center">Anda belum memilih menu</div>`;
                 } else {
                     ul.innerHTML = "";
                     cart.innerHTML = "";
@@ -209,9 +220,15 @@
                         const li = document.createElement("li");
                         li.className =
                             "list-group-item d-flex justify-content-between align-items-center";
-                        li.innerHTML = `Total <span class="badge bg-success rounded-pill">Rp. ${totalOrder}</span>`;
+                        li.innerHTML = `Total <span class="badge bg-warning rounded-pill">Rp. ${totalOrder}</span>`;
                         ul.appendChild(li);
                     }
+                    const li = document.createElement("li");
+                    li.innerHTML = `<li class="list-group-item d-flex align-items-center">
+                            <button class="btn  btn-sm btn-success form-control">Buat Pesanan</button>
+                            </li>`;
+                    li.style = "border-radius: 2px !important;";
+                    ul.appendChild(li);
                     cart.appendChild(ul);
                 }
             });
