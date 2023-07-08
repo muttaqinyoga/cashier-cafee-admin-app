@@ -22,7 +22,7 @@ const routing = {
                     .then((res) => {
                         return res;
                     });
-                if (dailyPayment && dailyPayment.data.dailypayment) {
+                if (dailyPayment.status && dailyPayment.data.dailypayment) {
                     dayPendapatan.textContent = formatter.formatRupiah(
                         dailyPayment.data.dailypayment
                     );
@@ -40,12 +40,12 @@ const routing = {
                     .then((res) => {
                         return res;
                     });
-                if (total) {
+                if (total.data.monthlypayment) {
                     monthPendapatan.textContent = formatter.formatRupiah(
                         total.data.monthlypayment
                     );
                 } else {
-                    monthPendapatan.textContent = "Gagal memuat data";
+                    monthPendapatan.textContent = "Data masih nol";
                 }
                 APP_LOADING.cancel(loading);
             },

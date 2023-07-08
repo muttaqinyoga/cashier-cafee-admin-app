@@ -503,14 +503,99 @@ class OrderController extends Controller
 
     public function customer($table)
     {
+        $checkTable = DiningTables::where('id', '=', $table, 'and')->where('status', '=', 'AVALIABLE')->get();
+        $currOrderSavedByTable = null;
+        if ($checkTable->count() > 0) {
+            $tableId = $checkTable->first()->id;
+            $tableNumber = $checkTable->first()->number;
+            $categories = DB::table('categories')->select('id', 'name')->get();
+            return view('customer', compact('categories', 'tableNumber', 'tableId', 'currOrderSavedByTable'));
+        } else {
+            $currOrderSavedByTable = Order::with(['table', 'foods'])->where('table_id', '=', $table, 'and')->where('status', '=', 'Proses')->orderBy('created_at', 'desc')->firstOrFail();
+            return view('customer', compact('currOrderSavedByTable'));
+        }
+    }
+
+    public function createOrderFromCustomer($table, Request $request)
+    {
+        $response = new Response();
         try {
-            $checkTable = DiningTables::where('id', '=', $table, 'and')->where('status', '=', 'AVALIABLE')->get()->count();
-            if ($checkTable > 0) {
-                $categories = DB::table('categories')->select('id', 'name')->get();
-                return view('customer', compact('categories'));
+            $orderReq = json_decode($request->_orders, true);
+            if (is_null($orderReq)) {
+                $response->setStatus(false);
+                $response->setMessage("Invalid request");
+                $response->setHttpCode(400);
+                $response->setData(null);
+                return $response->build();
             }
+            $validation = Validator::make($request->all(), [
+                'customerName' => 'required|string|max:30',
+                'customerNotes' => 'max:30'
+            ]);
+            if ($validation->fails()) {
+                $response->setStatus(false);
+                $response->setMessage('Input yang dikirim tidak sesuai');
+                $response->setHttpCode(400);
+                $response->setData(null);
+                return $response->build();
+            }
+            $id =  Uuid::uuid4()->getHex();
+            DB::beginTransaction();
+            $valid_foods = 0;
+            $total_price = 0;
+            $foods = Food::orderBy('created_at')->get();
+            $order = new Order;
+            $order->id = $id;
+            $order->order_number = date('YmdHis');
+            $order->customer_name = $request->customerName;
+            $order->total_price = $total_price;
+            $order->notes = $request->customerNotes;
+            $order->table_id = $table;
+            $dinning_table = DiningTables::where('id', '=', $table, 'and')->where('status', '!=', 'UNAVALIABLE')->firstOrFail();
+            $dinning_table->status = 'UNAVALIABLE';
+            $dinning_table->save();
+            $order->save();
+            foreach ($foods as $f) {
+                foreach ($orderReq as $of) {
+                    if ($f->id == $of['food']) {
+                        $valid_foods += 1;
+                        $total_price += intval($of['quantity']) * intval($f->price);
+                        $order_details = new OrderDetails;
+                        $order_details->order_id = $id;
+                        $order_details->food_id = $of['food'];
+                        $order_details->quantity_ordered = $of['quantity'];
+                        $order_details->save();
+                        break;
+                    }
+                }
+                if ($valid_foods == count($orderReq)) {
+                    break;
+                }
+            }
+            if ($valid_foods != count($orderReq)) {
+                DB::rollBack();
+                $response->setStatus(false);
+                $response->setMessage("Invalid request data : Food not valid!");
+                $response->setHttpCode(400);
+                $response->setData(null);
+                return $response->build();
+            }
+            $order->total_price = $total_price;
+            $order->save();
+            DB::commit();
+            $response->setStatus(true);
+            $response->setMessage("Order berhasil dibuat");
+            $response->setHttpCode(201);
+            $response->setData(null);
+            return $response->build();
         } catch (Throwable $th) {
-            return view('errors.500');
+            $response->setStatus(false);
+            $response->setMessage("Something Went Wrong in the Server");
+            $response->setHttpCode(500);
+            $response->setData([
+                "Details" => $th->getMessage()
+            ]);
+            return $response->build();
         }
     }
 }

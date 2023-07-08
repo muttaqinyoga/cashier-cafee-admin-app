@@ -1,8 +1,10 @@
 (function app() {
     const App = {
         init: async function () {
+            const loading = APP_LOADING.activate();
             this.data.menus = await this.getMenu();
             if (this.data.menus.status) {
+                APP_LOADING.cancel(loading);
                 this.showMenu(this.data.menus.data);
                 // Filter
                 const dropdownItem =
@@ -225,13 +227,89 @@
                     }
                     const li = document.createElement("li");
                     li.innerHTML = `<li class="list-group-item d-flex align-items-center">
-                            <button class="btn  btn-sm btn-success form-control">Buat Pesanan</button>
+                            <form class="row col"  id="sendOrderForm" action="" method="post">
+                                <div class="row">
+                                    <input type="text" class="form-control" name="customerName" id="customerName" placeholder="Pesanan atas nama..." />
+                                </div>
+                                <div class="row mt-3">
+                                    <input type="text" class="form-control" name="customerNotes" id="customerNotes" placeholder="Catatan..." />
+                                </div>
+                                <div class="row mt-3">
+                                    <input type="text" class="form-control-plaintext" readonly value="Nomor Meja : ${tableNumber}" />
+                                </div>
+                                <div class="row mt-3">
+                                    <button type="submit" class="btn btn-sm btn-success form-control">Buat Pesanan</button>
+                                </div>
+                                
+                            </form>
+            
                             </li>`;
                     li.style = "border-radius: 2px !important;";
                     ul.appendChild(li);
                     cart.appendChild(ul);
                 }
             });
+            document.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                if (e.target.id === "sendOrderForm") {
+                    const formData = new FormData(e.target);
+                    if (!formData.get("customerName")) {
+                        TOAST.classList.remove("bg-success");
+                        TOAST.classList.add("bg-danger");
+                        TOAST_BODY.textContent =
+                            "Wajib isi Nama Atas Pesanan ini";
+                        TOAST_APP.show();
+                        return;
+                    }
+                    if (!this.data.orders.length) {
+                        TOAST.classList.remove("bg-success");
+                        TOAST.classList.add("bg-danger");
+                        TOAST_BODY.textContent =
+                            "Could not send invalid request";
+                        TOAST_APP.show();
+                        return;
+                    }
+                    formData.append(
+                        "_orders",
+                        JSON.stringify(this.data.orders)
+                    );
+                    const loading = APP_LOADING.activate();
+                    const saved = await this.sendOrder(formData);
+                    if (!saved.status) {
+                        TOAST.classList.remove("bg-success");
+                        TOAST.classList.add("bg-danger");
+                        TOAST_BODY.textContent = saved.message;
+                        TOAST_APP.show();
+                        APP_LOADING.cancel(loading);
+                        return;
+                    } else {
+                        TOAST.classList.remove("bg-danger");
+                        TOAST.classList.add("bg-success");
+                        TOAST_BODY.textContent = saved.message;
+                        TOAST_APP.show();
+                        document.location.href = document.location;
+                    }
+                }
+            });
+        },
+        sendOrder: function (formData) {
+            return fetch(`${APP_STATE.baseUrl}/api/order/${code}`, {
+                method: "POST",
+                headers: {
+                    accept: "application/json",
+                },
+                credentials: "same-origin",
+                body: formData,
+            })
+                .then((response) => response.json())
+                .then((result) => result)
+                .catch((err) => {
+                    console.log(err);
+                    TOAST.classList.remove("bg-success");
+                    TOAST.classList.add("bg-danger");
+                    TOAST_BODY.textContent = "Could not send requests";
+                    TOAST_APP.show();
+                });
         },
     };
     textYear.innerHTML = `&copy;${new Date().getFullYear()} MTQ CAFE`;
