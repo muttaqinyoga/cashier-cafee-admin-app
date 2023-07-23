@@ -49,6 +49,9 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
+                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ubahPasswordModal" href="javascript:;">Change Password</a>
+                            </li>
+                            <li>
                                 <a class="dropdown-item" href="javascript:" id="logoutBtn">Sign out</a>
                                 <form action="{{ url('auth/logout') }}" id="formLogout" method="post" style="display: none;">
                                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
@@ -70,6 +73,39 @@
 
                 </div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ubah Password -->
+    <div class="modal fade" id="ubahPasswordModal" tabindex="-1" aria-labelledby="ubahPasswordLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="ubahPasswordLabel">Change Password</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="changePasswordForm" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                        <div class="mb-3" id="changePasswordMessage">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="oldPassword" class="col-form-label">Current Password</label>
+                            <input type="text" autocomplete="off" class="form-control" id="oldPassword" name="oldPassword">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="col-form-label">New Password</label>
+                            <input type="text" autocomplete="off" class="form-control" id="newPassword" name="newPassword">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>
@@ -96,6 +132,51 @@
             baseUrl: "{{ url('') }}",
             assetUrl: "{{ asset('') }}"
         });
+
+        function init() {
+            const ubahPasswordModal = new bootstrap.Modal('#ubahPasswordModal');
+            const changePasswordForm = document.querySelector('#changePasswordForm')
+            const changePasswordMessage = document.querySelector('#changePasswordMessage');
+            changePasswordForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                // if (!formData.get('oldPassword') || !formData.get('newPassword')) {
+                //     changePasswordMessage.innerHTML = `<strong class="text-danger">All field are required</strong>`;
+                //     return;
+                // }
+                ubahPasswordModal.hide();
+                fetch(APP_STATE.assetUrl + 'api/admin/password/update', {
+                        method: 'POST',
+                        headers: {
+                            accept: "application/json",
+                        },
+                        credentials: "same-origin",
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (!result.status) {
+                            TOAST_BODY.classList.remove('bg-primary');
+                            TOAST_BODY.classList.add('bg-danger')
+                            TOAST_BODY.textContent = result.message;
+                        } else {
+                            TOAST_BODY.classList.remove('bg-danger');
+                            TOAST_BODY.classList.add('bg-primary');
+                            TOAST_BODY.textContent = result.message;
+
+                        }
+                        changePasswordForm.reset();
+                        TOAST_APP.show();
+                    })
+                    .catch(err => {
+                        console.log(err);
+
+                    })
+            })
+
+
+        }
+        (init())
     </script>
     <script type="module" src="{{asset('SPA/src/js/main.js')}}"></script>
 

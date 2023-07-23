@@ -180,6 +180,12 @@ const food = {
                     }
                 );
                 /*   END DELETE ORDER  */
+
+                // REFRESH ORDER
+                const refreshOrder = document.querySelector("#refreshOrder");
+                refreshOrder.addEventListener("click", () => {
+                    routing.run("/admin/order");
+                });
             }
         },
         getFoods: function () {
@@ -234,6 +240,8 @@ const food = {
                         render: function (data) {
                             return data == "Proses"
                                 ? `<span class="badge rounded-pill bg-primary">${data}</span>`
+                                : data == "Batal"
+                                ? `<span class="badge rounded-pill bg-danger">${data}</span>`
                                 : `<span class="badge rounded-pill bg-success">${data}</span>`;
                         },
                         sortable: true,
@@ -244,6 +252,9 @@ const food = {
                         render: (data, cell, row) => {
                             const status = row.childNodes[5].textContent;
                             if (status === "Selesai") {
+                                return `<button type="button" class="btn btn-info btn-sm detailOrder">Detail</button>`;
+                            }
+                            if (status === "Batal") {
                                 return `<button type="button" class="btn btn-info btn-sm detailOrder">Detail</button>`;
                             }
                             return `

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('order_number')->unique();
             $table->float('total_price')->unsigned()->defaults(0);
             $table->string('customer_name');
-            $table->enum('status', ['Proses', 'Selesai'])->default('Proses');
+            $table->enum('status', ['Proses', 'Selesai', 'Batal'])->default('Proses');
             $table->uuid('table_id')->nullable()->default(null);
             $table->timestamps();
             $table->foreign('table_id')->references('id')->on('dining_tables');

@@ -48,6 +48,45 @@
                         this.showMenu(this.data.menus.data);
                     });
                 });
+                window.addEventListener("submit", async (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    if (e.target.id === "sendOrderForm") {
+                        const formData = new FormData(e.target);
+                        if (!formData.get("customerName")) {
+                            TOAST.classList.remove("bg-success");
+                            TOAST.classList.add("bg-danger");
+                            TOAST_BODY.textContent =
+                                "Wajib isi Nama Atas Pesanan ini";
+                            TOAST_APP.show();
+                            return;
+                        }
+                        if (!this.data.orders.length) {
+                            TOAST.classList.remove("bg-success");
+                            TOAST.classList.add("bg-danger");
+                            TOAST_BODY.textContent =
+                                "Could not send invalid request";
+                            TOAST_APP.show();
+                            return;
+                        }
+                        formData.append(
+                            "_orders",
+                            JSON.stringify(this.data.orders)
+                        );
+                        const loading = APP_LOADING.activate();
+                        const saved = await this.sendOrder(formData);
+                        if (!saved.status) {
+                            TOAST.classList.remove("bg-success");
+                            TOAST.classList.add("bg-danger");
+                            TOAST_BODY.textContent = saved.message;
+                            TOAST_APP.show();
+                            APP_LOADING.cancel(loading);
+                            return;
+                        }
+                        document.location.href = document.location;
+                    }
+                });
                 return;
             }
         },
@@ -249,48 +288,6 @@
                     cart.appendChild(ul);
                 }
             });
-            document.addEventListener("submit", async (e) => {
-                e.preventDefault();
-                if (e.target.id === "sendOrderForm") {
-                    const formData = new FormData(e.target);
-                    if (!formData.get("customerName")) {
-                        TOAST.classList.remove("bg-success");
-                        TOAST.classList.add("bg-danger");
-                        TOAST_BODY.textContent =
-                            "Wajib isi Nama Atas Pesanan ini";
-                        TOAST_APP.show();
-                        return;
-                    }
-                    if (!this.data.orders.length) {
-                        TOAST.classList.remove("bg-success");
-                        TOAST.classList.add("bg-danger");
-                        TOAST_BODY.textContent =
-                            "Could not send invalid request";
-                        TOAST_APP.show();
-                        return;
-                    }
-                    formData.append(
-                        "_orders",
-                        JSON.stringify(this.data.orders)
-                    );
-                    const loading = APP_LOADING.activate();
-                    const saved = await this.sendOrder(formData);
-                    if (!saved.status) {
-                        TOAST.classList.remove("bg-success");
-                        TOAST.classList.add("bg-danger");
-                        TOAST_BODY.textContent = saved.message;
-                        TOAST_APP.show();
-                        APP_LOADING.cancel(loading);
-                        return;
-                    } else {
-                        TOAST.classList.remove("bg-danger");
-                        TOAST.classList.add("bg-success");
-                        TOAST_BODY.textContent = saved.message;
-                        TOAST_APP.show();
-                        document.location.href = document.location;
-                    }
-                }
-            });
         },
         sendOrder: function (formData) {
             return fetch(`${APP_STATE.baseUrl}/api/order/${code}`, {
@@ -302,14 +299,7 @@
                 body: formData,
             })
                 .then((response) => response.json())
-                .then((result) => result)
-                .catch((err) => {
-                    console.log(err);
-                    TOAST.classList.remove("bg-success");
-                    TOAST.classList.add("bg-danger");
-                    TOAST_BODY.textContent = "Could not send requests";
-                    TOAST_APP.show();
-                });
+                .then((result) => result);
         },
     };
     textYear.innerHTML = `&copy;${new Date().getFullYear()} MTQ CAFE`;

@@ -386,11 +386,13 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
             $order = Order::where('id', '=', $request->delete_id, 'and')->where('status', '!=', 'Selesai')->firstOrFail();
-            $order->foods()->detach();
+            // $order->foods()->detach();
             $dinning_table = DiningTables::findOrFail($order->table_id);
             $dinning_table->status = 'AVALIABLE';
             $dinning_table->update();
-            $order->delete();
+            // $order->delete();
+            $order->status = 'Batal';
+            $order->update();
             DB::commit();
             $response->setStatus(true);
             $response->setMessage("$order->order_number has been canceled");
@@ -508,7 +510,8 @@ class OrderController extends Controller
         if ($checkTable->count() > 0) {
             $tableId = $checkTable->first()->id;
             $tableNumber = $checkTable->first()->number;
-            $categories = DB::table('categories')->select('id', 'name')->get();
+            // $categories = DB::table('categories')->select('id', 'name')->get();
+            $categories = Category::whereRelation('foods', 'status_stock', '!=', 'Tidak Tersedia')->get();
             return view('customer', compact('categories', 'tableNumber', 'tableId', 'currOrderSavedByTable'));
         } else {
             $currOrderSavedByTable = Order::with(['table', 'foods'])->where('table_id', '=', $table, 'and')->where('status', '=', 'Proses')->orderBy('created_at', 'desc')->firstOrFail();

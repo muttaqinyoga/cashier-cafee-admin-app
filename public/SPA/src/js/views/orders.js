@@ -6,9 +6,12 @@ export default () =>
         <div class="card">
             <h3 class="card-header bg-info text-white text-center p-3">Order List</h3>
             <div class="card-body text-white">
-                <div class="row">
+                <div class="row justify-content-between">
                     <div class="col-md-3">
                         <a href="/admin/order/add" class="btn btn-outline-info" data-link>Create New Order</a>
+                    </div>
+                    <div class="col-md-3">
+                        <button id="refreshOrder" class="btn btn-outline-warning" data-link>Refresh</button>
                     </div>
                 </div>
                 <div class="row mt-3">
