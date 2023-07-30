@@ -140,10 +140,10 @@
             changePasswordForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target);
-                // if (!formData.get('oldPassword') || !formData.get('newPassword')) {
-                //     changePasswordMessage.innerHTML = `<strong class="text-danger">All field are required</strong>`;
-                //     return;
-                // }
+                if (!formData.get('oldPassword') || !formData.get('newPassword')) {
+                    changePasswordMessage.innerHTML = `<strong class="text-danger">All field are required</strong>`;
+                    return;
+                }
                 ubahPasswordModal.hide();
                 fetch(APP_STATE.assetUrl + 'api/admin/password/update', {
                         method: 'POST',
