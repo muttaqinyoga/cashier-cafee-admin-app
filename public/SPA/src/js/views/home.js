@@ -31,6 +31,12 @@ export default () =>
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-3>
+                        <h5 class="card-title">Tabel Pendapatan</h5>
+                    </div>
+                    
+                </div>
             </div>
         </div>
     </div>

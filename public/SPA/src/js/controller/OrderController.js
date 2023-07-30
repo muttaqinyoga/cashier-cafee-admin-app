@@ -252,7 +252,8 @@ const food = {
                         render: (data, cell, row) => {
                             const status = row.childNodes[5].textContent;
                             if (status === "Selesai") {
-                                return `<button type="button" class="btn btn-info btn-sm detailOrder">Detail</button>`;
+                                return `<button type="button" class="btn btn-info btn-sm detailOrder">Detail</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm printOrder">Print Invoice</button>`;
                             }
                             if (status === "Batal") {
                                 return `<button type="button" class="btn btn-info btn-sm detailOrder">Detail</button>`;
@@ -381,6 +382,94 @@ const food = {
                         payment_order_id.value,
                         finishOrderModal
                     );
+                } else if (e.target.classList.contains("printOrder")) {
+                    const idx = e.target.parentNode.parentNode.dataIndex;
+                    const data = this.data.table.data[idx];
+                    const div = `<table width="100%" border="1" cellpadding="5" cellspacing="0" align="center">
+                        <tr>
+                            <td colspan="2" align="center" style="font-size:18px"><b>Invoice</b></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                            <table width="100%" cellpadding="5">
+                            <tr>
+                                <td width="15%">No. Pesanan</td>
+                                <td width="1%">:</td>
+                                <td>${data[0]}</td>
+                            </tr>
+                            <tr>
+                                <td>Waktu Pemesanan</td>
+                                <td>:</td>
+                                <td>${new Date(data[4]).toLocaleString()}</td>
+                            </tr>
+                            ${
+                                data[2]
+                                    ? `<tr>
+                                <td>No. Meja</td>
+                                <td>:</td>
+                                <td>${data[2]}</td>
+                            </tr>`
+                                    : ""
+                            }
+                            </table>
+                            <br />
+                            <table width="100%" border="1" cellpadding="5" cellspacing="0">
+                            <tr>
+                            <th>No.</th>
+                            <th>Menu</th>
+                            <th>Porsi</th>
+                            <th>Total Harga</th>
+                            </tr>
+                            ${formatPrintMenu(data[7])}
+                            <tr>
+                                <th colspan="2">Total Pembayaran</th>
+                                <td colspan="2">${formatter.formatRupiah(
+                                    data[3]
+                                )}</td>
+                            </tr>
+                            <tr>
+                                <th colspan="2">Waktu Pembayaran</th>
+                                <td colspan="2">${new Date(
+                                    data[9]
+                                ).toLocaleString()}</td>
+                            </tr>
+                            </table>
+                            <br />
+                            <p>Terima kasih</p>
+                            </td>
+                            </tr>
+                        </table>`;
+                    const print = window.open("", "", "height=500, width=500");
+                    print.document.write("<html>");
+                    print.document.write(`<head>
+                        <title>${data[0]}</title>
+                    </head>`);
+                    print.document.write("<body>");
+                    print.document.write(div);
+                    print.document.write("</body></html>");
+                    print.document.close();
+                    print.print();
+                }
+
+                function formatPrintMenu(menu) {
+                    let tr = "";
+
+                    menu.forEach((m, i) => {
+                        const total =
+                            parseInt(m.price) *
+                            parseInt(m.pivot.quantity_ordered);
+                        tr += `<tr>
+                                <td>${++i}</td>
+                                <td>${m.name} (${formatter.formatRupiah(
+                            m.price
+                        )})</td>
+                                <td>${m.pivot.quantity_ordered}</td>
+                                <td>${formatter.formatRupiah(
+                                    total.toString()
+                                )}</td>
+                        </tr>`;
+                    });
+                    return tr;
                 }
             });
 

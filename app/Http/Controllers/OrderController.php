@@ -464,7 +464,7 @@ class OrderController extends Controller
         $response = new Response();
         try {
             $currMonth  = date('m');
-            $paymonth = DB::table('orders')->select(DB::raw('SUM(total_price) as monthlyPayment'))->whereMonth('created_at', '=', $currMonth)->first();
+            $paymonth = DB::table('orders')->select(DB::raw('SUM(total_price) as monthlyPayment'))->whereMonth('created_at', '=', $currMonth, 'and')->where('status', '=', 'Selesai')->first();
             $response->setStatus(true);
             $response->setMessage('success');
             $response->setData($paymonth);

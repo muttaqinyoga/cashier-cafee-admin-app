@@ -61,4 +61,7 @@ Route::group(['middleware' => 'auth'], function () {
 Route::get('/customer/order/{table}', [OrderController::class, 'customer']);
 Route::get('/api/menus/get', [OrderController::class, 'getListFood']);
 Route::post('/api/order/{table}', [OrderController::class, 'createOrderFromCustomer']);
+Route::get('/invoice', function () {
+    return 'invoice';
+});
 // Route::get('{path}', HomeController::class)->where('path', '(.*)');

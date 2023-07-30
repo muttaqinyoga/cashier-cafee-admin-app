@@ -56,7 +56,6 @@
             init: function() {
                 const loginBtn = document.querySelector("#loginBtn");
                 const formLogin = document.querySelector("#formLogin");
-                console.log(formLogin);
                 formLogin.addEventListener("submit", e => {
                     e.preventDefault();
                     loginBtn.innerText = "Signing...";
