@@ -503,6 +503,26 @@ class OrderController extends Controller
         }
     }
 
+    public function getPayments()
+    {
+        $response = new Response();
+        try {
+            $payments = DB::table('orders')->select(DB::raw("to_char(updated_at, 'MONTH') as month, extract(year from updated_at) as year, SUM(total_price) as total"))->where('status', '=', 'Selesai', 'and')->groupBy(['year', 'month'])->get();
+            $response->setStatus(true);
+            $response->setMessage('success');
+            $response->setData($payments);
+            $response->setHttpCode(200);
+            return $response->build();
+        } catch (Throwable $t) {
+            $response->setStatus(false);
+            $response->setMessage("Something Went Wrong in the Server");
+            $response->setHttpCode(500);
+            $response->setData([
+                "Details" => $t->getMessage()
+            ]);
+            return $response->build();
+        }
+    }
     public function customer($table)
     {
         $checkTable = DiningTables::where('id', '=', $table, 'and')->where('status', '=', 'AVALIABLE')->get();

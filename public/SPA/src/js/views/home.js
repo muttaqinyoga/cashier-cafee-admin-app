@@ -32,10 +32,14 @@ export default () =>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3>
+                    <div class="col-md-2>
                         <h5 class="card-title">Tabel Pendapatan</h5>
                     </div>
-                    
+                    <div class="col-md-10 col-sm-12">
+                        <table id="pendapatanTable" class="table table-striped table-responsive">
+                        
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

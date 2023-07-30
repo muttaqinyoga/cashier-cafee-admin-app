@@ -54,14 +54,11 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/api/admin/order/paymentmonthly', [OrderController::class, 'getMonthlyPayment']);
     Route::get('/api/admin/order/paymentdaily', [OrderController::class, 'getDailyPayment']);
-
+    Route::get('/api/admin/order/payments', [OrderController::class, 'getPayments']);
     Route::post('/api/admin/password/update', [HomeController::class, 'updatePassword']);
 });
 
 Route::get('/customer/order/{table}', [OrderController::class, 'customer']);
 Route::get('/api/menus/get', [OrderController::class, 'getListFood']);
 Route::post('/api/order/{table}', [OrderController::class, 'createOrderFromCustomer']);
-Route::get('/invoice', function () {
-    return 'invoice';
-});
 // Route::get('{path}', HomeController::class)->where('path', '(.*)');

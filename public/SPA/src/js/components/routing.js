@@ -47,6 +47,46 @@ const routing = {
                 } else {
                     monthPendapatan.textContent = "Data masih nol";
                 }
+
+                // init tabel
+                const payments = await fetch(
+                    `${APP_STATE.baseUrl}/api/admin/order/payments`
+                )
+                    .then((response) => response.json())
+                    .then((res) => res);
+                if (payments.status) {
+                    const pendapatanTable =
+                        document.querySelector("#pendapatanTable");
+                    pendapatanTable.innerHTML = `<thead class="bg-danger text-white">
+                                                    <tr>
+                                                        <th>
+                                                        Tahun
+                                                        </th>
+                                                        <th>Bulan</th>
+                                                        <th>Total Pendapatan</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${initTableBody(
+                                                        payments.data
+                                                    )}
+                                                </tbody>`;
+                    const initPendTable = new simpleDatatables.DataTable(
+                        pendapatanTable
+                    );
+                }
+
+                function initTableBody(data) {
+                    let tr = "";
+                    data.forEach((p) => {
+                        tr += `<tr>
+                                <td>${p.year}</td>
+                                <td>${p.month.trim()}</td>
+                                <td>${formatter.formatRupiah(p.total)}</td>
+                                </tr>`;
+                    });
+                    return tr;
+                }
                 APP_LOADING.cancel(loading);
             },
         },
